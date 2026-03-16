@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l \"c:/Users/Razer18/Desktop/공심이/DIGG/js/modules/\"*.js \"c:/Users/Razer18/Desktop/공심이/DIGG/js/html/\"*.js \"c:/Users/Razer18/Desktop/공심이/DIGG/css/\"*.css)"
+    ]
+  }
+}

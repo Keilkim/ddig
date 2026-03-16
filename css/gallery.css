@@ -1,0 +1,90 @@
+/* ========================================
+   갤러리 Styles
+   ======================================== */
+
+.gallery-container {
+  position: relative;
+  height: 100px;
+  background: rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.gallery-scroll {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 100%;
+  align-items: center;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.gallery-scroll::-webkit-scrollbar { display: none; }
+
+/* 사진 카드 */
+.gallery-card {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+  scroll-snap-align: start;
+  box-shadow: var(--shadow-sm);
+}
+
+.gallery-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-card-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--color-white);
+  font-size: 9px;
+  text-align: center;
+  padding: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gallery-card-delete {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-circle);
+  background: rgba(212, 107, 107, 0.85);
+  color: white;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* 빈 상태 */
+.gallery-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  color: var(--color-titanium);
+}
+
+.gallery-empty-icon { font-size: 24px; }
+.gallery-empty-text { font-size: var(--font-size-xs); }

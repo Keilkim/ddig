@@ -1,0 +1,7 @@
+supabase-config.js
+apikey.js
+node_modules/
+.env
+.env.local
+.DS_Store
+Thumbs.db

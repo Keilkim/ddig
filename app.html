@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#F7F5F0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>DIGG X GONGSIM</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/popup.css">
+  <link rel="stylesheet" href="css/plogging.css">
+  <link rel="stylesheet" href="css/gallery.css">
+  <link rel="stylesheet" href="css/buttons.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/charts.css">
+  <link rel="stylesheet" href="css/calendar.css">
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+
+  <!-- Leaflet.js (Maps) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1/dist/leaflet.js"></script>
+</head>
+<body class="safe-area-top safe-area-bottom">
+
+  <!-- Layer 0: HTML Templates -->
+  <script src="js/html/title-bar.js"></script>
+  <script src="js/html/permission-popup.js"></script>
+  <script src="js/html/camera-view.js"></script>
+  <script src="js/html/gallery.js"></script>
+  <script src="js/html/button-group.js"></script>
+  <script src="js/html/dashboard-display.js"></script>
+  <script src="js/html/chart-view.js"></script>
+  <script src="js/html/history-view.js"></script>
+  <script src="js/html/filter-bar.js"></script>
+  <script src="js/html/calendar-popup.js"></script>
+  <script src="js/html/ai-popup.js"></script>
+
+  <!-- Layer 1: Assembler -->
+  <script src="js/html/assembler.js"></script>
+
+  <!-- Layer 2: Core Modules -->
+  <script src="js/modules/state.js"></script>
+  <script src="js/modules/auth.js"></script>
+  <script src="js/modules/router.js"></script>
+
+  <!-- Layer 3: Feature Modules -->
+  <script src="js/modules/camera.js"></script>
+  <script src="js/modules/geolocation.js"></script>
+  <script src="js/modules/supabase-storage.js"></script>
+  <script src="js/modules/supabase-data.js"></script>
+  <script src="js/modules/photo-manager.js"></script>
+
+  <!-- Layer 4: Gemini API -->
+  <script src="apikey.js"></script>
+  <script src="js/modules/gemini-api.js"></script>
+
+  <!-- Layer 5: Dashboard & Features -->
+  <script src="js/modules/dashboard.js"></script>
+  <script src="js/modules/calendar.js"></script>
+  <script src="js/modules/filter.js"></script>
+  <script src="js/modules/ai-analysis.js"></script>
+
+  <!-- Layer 6: Init -->
+  <script src="js/modules/init.js"></script>
+</body>
+</html>

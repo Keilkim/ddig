@@ -1,0 +1,17 @@
+/* ========================================
+   공통 버튼 Styles
+   ======================================== */
+
+/* 대쉬보드 뷰의 버튼 그룹 */
+#view-dashboard .btn-group {
+  background: var(--color-white);
+  border-top: 1px solid var(--color-titanium-light);
+}
+
+#view-dashboard .btn-group-item {
+  color: var(--color-charcoal);
+}
+
+#view-dashboard .btn-group-item:active {
+  color: var(--color-accent);
+}

@@ -1,0 +1,201 @@
+/* ========================================
+   DIGG X GONGSIM — Base Styles
+   구겐하임 미술관 + 프랑크 게리 UI
+   ======================================== */
+
+/* --- Google Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap');
+
+/* --- CSS Custom Properties (Design Tokens) --- */
+:root {
+  /* Fonts */
+  --font-primary: 'Noto Sans KR', sans-serif;
+  --font-display: 'Playfair Display', serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+  --font-size-3xl: 2.5rem;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* Colors — Titanium / Museum palette */
+  --color-titanium: #C4C4C4;
+  --color-titanium-light: #E8E8E8;
+  --color-titanium-dark: #8A8A8A;
+  --color-white: #FFFFFF;
+  --color-off-white: #F7F5F0;
+  --color-warm-gray: #B8B0A4;
+  --color-concrete: #D9D3CB;
+  --color-charcoal: #2C2C2C;
+  --color-ink: #1A1A1A;
+  --color-accent: #4A90D9;
+  --color-accent-warm: #D4956A;
+  --color-accent-green: #6BAF7B;
+  --color-accent-red: #D46B6B;
+  --color-success: #6BAF7B;
+  --color-warning: #D4A56A;
+  --color-error: #D46B6B;
+  --color-overlay: rgba(26, 26, 26, 0.6);
+  --color-glass: rgba(255, 255, 255, 0.85);
+
+  /* Gradients */
+  --gradient-titanium: linear-gradient(135deg, #E8E8E8 0%, #C4C4C4 50%, #A8A8A8 100%);
+  --gradient-warm: linear-gradient(135deg, #F7F5F0 0%, #E8E2D8 100%);
+  --gradient-gehry: linear-gradient(160deg, #F0EDE8 0%, #D9D3CB 40%, #C4C4C4 100%);
+
+  /* Border Radius — Gehry organic curves */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-gehry: 40% 60% 55% 45% / 55% 40% 60% 45%;
+  --radius-organic1: 30% 70% 60% 40% / 50% 60% 40% 50%;
+  --radius-organic2: 60% 40% 45% 55% / 40% 55% 60% 45%;
+  --radius-pill: 999px;
+  --radius-circle: 50%;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+  --shadow-inner: inset 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-gehry: 4px 6px 20px rgba(0, 0, 0, 0.1), -2px -3px 15px rgba(255, 255, 255, 0.5);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --transition-gehry: 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* --- Reset --- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-ink);
+  background: var(--color-off-white);
+  line-height: 1.6;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Mobile Viewport --- */
+@supports (height: 100dvh) {
+  body { min-height: 100dvh; }
+}
+
+/* --- Typography --- */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+}
+
+/* --- Utility --- */
+.hidden { display: none !important; }
+
+.view-container {
+  display: none;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.view-container.active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Buttons Base --- */
+button, .btn {
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-medium);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+button:active, .btn:active {
+  transform: scale(0.96);
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-titanium);
+  border-radius: var(--radius-pill);
+}
+
+/* --- Safe Area --- */
+.safe-area-top { padding-top: env(safe-area-inset-top); }
+.safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+/* --- Popup/Modal Base --- */
+.popup-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.popup-overlay.active {
+  display: flex;
+}
+.popup-content {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: var(--space-xl);
+}
+
+/* --- Loading Spinner --- */
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-titanium-light);
+  border-top-color: var(--color-accent);
+  border-radius: var(--radius-circle);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

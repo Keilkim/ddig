@@ -1,0 +1,137 @@
+/* ========================================
+   로그인-view Styles
+   ======================================== */
+
+.login-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: var(--space-xl);
+  background: var(--gradient-warm);
+  gap: var(--space-xl);
+}
+
+/* Row 1: 앱 로고 */
+.login-logo {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.app-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink);
+  letter-spacing: 0.15em;
+  line-height: 1;
+}
+
+.app-subtitle {
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-light);
+  color: var(--color-titanium-dark);
+  letter-spacing: 0.3em;
+  margin-top: var(--space-xs);
+}
+
+/* Row 2: 구글 로그인 버튼 */
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  max-width: 320px;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-white);
+  color: var(--color-charcoal);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+}
+
+.btn-google:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+.btn-google:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Row 3: 자동 로그인 */
+.auto-login-area {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.auto-login-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-titanium-dark);
+}
+
+/* Toggle Switch */
+.auto-login-toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.auto-login-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--color-titanium-light);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: var(--color-white);
+  border-radius: var(--radius-circle);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-normal);
+}
+
+.auto-login-toggle input:checked + .toggle-slider {
+  background: var(--color-accent-green);
+}
+
+.auto-login-toggle input:checked + .toggle-slider::before {
+  transform: translateX(20px);
+}
+
+/* Row 4: 계정 전환 */
+.btn-switch {
+  background: none;
+  color: var(--color-titanium-dark);
+  font-size: var(--font-size-sm);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: var(--space-sm);
+}
+
+.btn-switch:hover {
+  color: var(--color-ink);
+}

@@ -1,0 +1,97 @@
+{
+  "meta": {
+    "name": "DIGG X GONGSIM",
+    "concept": "구겐하임 미술관 + 프랑크 게리 UI",
+    "description": "유기적 곡선, 티타늄 질감, 뮤지엄급 여백, 해체주의 레이아웃"
+  },
+  "fonts": {
+    "primary": "'Noto Sans KR', sans-serif",
+    "display": "'Playfair Display', serif",
+    "mono": "'JetBrains Mono', monospace",
+    "sizeBase": "16px",
+    "scale": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "md": "1rem",
+      "lg": "1.25rem",
+      "xl": "1.5rem",
+      "2xl": "2rem",
+      "3xl": "2.5rem"
+    },
+    "weight": {
+      "light": 300,
+      "regular": 400,
+      "medium": 500,
+      "bold": 700
+    }
+  },
+  "colors": {
+    "titanium": "#C4C4C4",
+    "titaniumLight": "#E8E8E8",
+    "titaniumDark": "#8A8A8A",
+    "white": "#FFFFFF",
+    "offWhite": "#F7F5F0",
+    "warmGray": "#B8B0A4",
+    "concrete": "#D9D3CB",
+    "charcoal": "#2C2C2C",
+    "ink": "#1A1A1A",
+    "accent": "#4A90D9",
+    "accentWarm": "#D4956A",
+    "accentGreen": "#6BAF7B",
+    "accentRed": "#D46B6B",
+    "success": "#6BAF7B",
+    "warning": "#D4A56A",
+    "error": "#D46B6B",
+    "overlay": "rgba(26, 26, 26, 0.6)",
+    "glass": "rgba(255, 255, 255, 0.85)",
+    "gradient": {
+      "titanium": "linear-gradient(135deg, #E8E8E8 0%, #C4C4C4 50%, #A8A8A8 100%)",
+      "warm": "linear-gradient(135deg, #F7F5F0 0%, #E8E2D8 100%)",
+      "gehry": "linear-gradient(160deg, #F0EDE8 0%, #D9D3CB 40%, #C4C4C4 100%)"
+    }
+  },
+  "radius": {
+    "sm": "8px",
+    "md": "16px",
+    "lg": "24px",
+    "xl": "32px",
+    "gehry": "40% 60% 55% 45% / 55% 40% 60% 45%",
+    "organic1": "30% 70% 60% 40% / 50% 60% 40% 50%",
+    "organic2": "60% 40% 45% 55% / 40% 55% 60% 45%",
+    "pill": "999px",
+    "circle": "50%"
+  },
+  "spacing": {
+    "xs": "4px",
+    "sm": "8px",
+    "md": "16px",
+    "lg": "24px",
+    "xl": "32px",
+    "2xl": "48px",
+    "3xl": "64px"
+  },
+  "shadows": {
+    "sm": "0 2px 8px rgba(0, 0, 0, 0.06)",
+    "md": "0 4px 16px rgba(0, 0, 0, 0.08)",
+    "lg": "0 8px 32px rgba(0, 0, 0, 0.12)",
+    "xl": "0 16px 48px rgba(0, 0, 0, 0.16)",
+    "inner": "inset 0 2px 8px rgba(0, 0, 0, 0.06)",
+    "gehry": "4px 6px 20px rgba(0, 0, 0, 0.1), -2px -3px 15px rgba(255, 255, 255, 0.5)"
+  },
+  "transitions": {
+    "fast": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+    "normal": "300ms cubic-bezier(0.4, 0, 0.2, 1)",
+    "slow": "500ms cubic-bezier(0.4, 0, 0.2, 1)",
+    "bounce": "500ms cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+    "gehry": "600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+  },
+  "trashCategories": {
+    "plastic": { "label": "플라스틱", "color": "#4A90D9", "icon": "♻️" },
+    "paper": { "label": "종이", "color": "#D4956A", "icon": "📄" },
+    "glass": { "label": "유리", "color": "#6BAF7B", "icon": "🫙" },
+    "metal": { "label": "금속", "color": "#C4C4C4", "icon": "🥫" },
+    "organic": { "label": "음식물", "color": "#8B6914", "icon": "🍂" },
+    "cigarette": { "label": "담배꽁초", "color": "#D46B6B", "icon": "🚬" },
+    "other": { "label": "기타", "color": "#8A8A8A", "icon": "🗑️" }
+  }
+}
