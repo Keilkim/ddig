@@ -108,3 +108,112 @@
   height: 50px;
   background: var(--color-titanium-light);
 }
+
+/* ─── 쓰레기 아님 토스트 ─── */
+.not-trash-toast {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 14px 24px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  max-width: 80vw;
+  backdrop-filter: blur(10px);
+}
+
+.not-trash-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ─── Detection 오버레이 ─── */
+.detection-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detection-overlay img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.detection-box-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detection-box-container > .detection-box {
+  position: absolute;
+}
+
+.detection-box {
+  border: 2px solid;
+  border-radius: 4px;
+}
+
+.detection-box-trash {
+  border-color: #ff4444;
+  background: rgba(255, 68, 68, 0.15);
+}
+
+.detection-box-clean {
+  border-color: #44cc44;
+  background: rgba(68, 204, 68, 0.15);
+}
+
+.detection-label {
+  position: absolute;
+  top: -22px;
+  left: 0;
+  background: inherit;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.detection-box-trash .detection-label {
+  background: #ff4444;
+}
+
+.detection-box-clean .detection-label {
+  background: #44cc44;
+}
+
+.detection-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  z-index: 1;
+}
