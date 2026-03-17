@@ -1,0 +1,1 @@
+var GEMINI_API_KEY = '';
