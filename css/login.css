@@ -1,5 +1,5 @@
 /* ========================================
-   로그인-view — 한 화면 고정, 깔끔
+   로그인 — Apple 미니멀
    ======================================== */
 
 .login-view {
@@ -10,32 +10,31 @@
   height: 100vh;
   height: 100dvh;
   padding: var(--space-xl);
-  background: linear-gradient(180deg, #f0f8f5 0%, var(--color-off-white) 100%);
+  background: var(--color-bg);
   gap: var(--space-xl);
   overflow: hidden;
 }
 
 .login-logo {
   text-align: center;
-  margin-bottom: var(--space-2xl);
+  margin-bottom: 40px;
 }
 
 .app-title {
-  font-family: var(--font-display);
   font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-ink);
-  letter-spacing: 0.15em;
+  font-weight: 700;
+  color: var(--color-label);
+  letter-spacing: 0.06em;
   line-height: 1;
 }
 
 .app-subtitle {
-  font-family: var(--font-display);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-light);
-  color: var(--color-leaf);
-  letter-spacing: 0.3em;
-  margin-top: var(--space-xs);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--color-secondary);
+  letter-spacing: 0.15em;
+  margin-top: 6px;
+  text-transform: uppercase;
 }
 
 .btn-google {
@@ -44,18 +43,13 @@
   justify-content: center;
   gap: var(--space-sm);
   width: 100%;
-  max-width: 300px;
-  padding: 12px var(--space-lg);
+  max-width: 280px;
+  padding: 14px var(--space-lg);
   background: var(--color-white);
-  color: var(--color-charcoal);
+  color: var(--color-label);
   font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
-  border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-md);
-}
-
-.btn-google:active {
-  transform: scale(0.97);
+  font-weight: 500;
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
 }
 
@@ -67,14 +61,14 @@
 
 .auto-login-label {
   font-size: var(--font-size-sm);
-  color: var(--color-titanium-dark);
+  color: var(--color-secondary);
 }
 
 .auto-login-toggle {
   position: relative;
   display: inline-block;
-  width: 40px;
-  height: 22px;
+  width: 51px;
+  height: 31px;
 }
 
 .auto-login-toggle input { opacity: 0; width: 0; height: 0; }
@@ -82,38 +76,37 @@
 .toggle-slider {
   position: absolute;
   inset: 0;
-  background: var(--color-titanium-light);
+  background: var(--color-fill);
   border-radius: var(--radius-pill);
   cursor: pointer;
-  transition: background var(--transition-normal);
+  transition: background 0.25s;
 }
 
 .toggle-slider::before {
   content: '';
   position: absolute;
-  width: 16px;
-  height: 16px;
-  left: 3px;
-  bottom: 3px;
+  width: 27px;
+  height: 27px;
+  left: 2px;
+  bottom: 2px;
   background: var(--color-white);
-  border-radius: var(--radius-circle);
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-normal);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  transition: transform 0.25s;
 }
 
 .auto-login-toggle input:checked + .toggle-slider {
-  background: var(--color-mint);
+  background: var(--color-green);
 }
 
 .auto-login-toggle input:checked + .toggle-slider::before {
-  transform: translateX(18px);
+  transform: translateX(20px);
 }
 
 .btn-switch {
   background: none;
-  color: var(--color-titanium-dark);
-  font-size: var(--font-size-xs);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  color: var(--color-blue);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
   padding: var(--space-sm);
 }

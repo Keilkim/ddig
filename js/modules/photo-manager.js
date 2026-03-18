@@ -6,8 +6,6 @@
    ════════════════════════════════════════ */
 
 var _isCapturing = false;
-
-/* ─── 임시 데이터 (모달 확인 전) ─── */
 var _pendingCapture = null;
 
 async function capturePhoto() {
@@ -15,36 +13,26 @@ async function capturePhoto() {
   _isCapturing = true;
 
   try {
-    // 1. 플래시 효과
     flashEffect();
-
-    // 2. 프레임 캡처
     var blob = await captureFrame();
-
-    // 3. 위치 정보
     var loc = await getCurrentLocation();
 
-    // 4. Gemini 분석 (저장 전에 먼저!)
     showAnalyzingOverlay();
     var base64 = await blobToBase64(blob);
     var analysis = await analyzePhoto(base64);
     hideAnalyzingOverlay();
 
     if (!analysis) {
-      // API 실패 시 기본 저장 플로우
       _pendingCapture = { blob: blob, loc: loc, analysis: null };
       showConfirmModal(blob, null);
       return;
     }
 
-    // 5. 쓰레기 여부에 따라 모달 표시
     _pendingCapture = { blob: blob, loc: loc, analysis: analysis };
 
     if (!analysis.is_trash) {
-      // 쓰레기가 아님 → 알림 모달
       showNotTrashModal(blob, analysis);
     } else {
-      // 쓰레기 → 확인 모달 (바운딩박스 + 컨피던스)
       showConfirmModal(blob, analysis);
     }
 
@@ -99,7 +87,6 @@ function showNotTrashModal(blob, analysis) {
         '<div class="detection-badge not-trash-badge">CLEAN</div>' +
       '</div>' +
       '<p class="detection-modal-desc">' + (analysis.description || '쓰레기가 감지되지 않았습니다') + '</p>' +
-      buildObjectsList(analysis.objects, false) +
       '<div class="detection-modal-actions">' +
         '<button class="detection-btn detection-btn-close" onclick="closeDetectionModal()">확인</button>' +
       '</div>' +
@@ -109,7 +96,7 @@ function showNotTrashModal(blob, analysis) {
   setTimeout(function() { modal.classList.add('show'); }, 10);
 }
 
-/* ─── 쓰레기 확인 모달 (바운딩박스 + 컨피던스) ─── */
+/* ─── 쓰레기 확인 모달 ─── */
 function showConfirmModal(blob, analysis) {
   var existing = document.getElementById('detection-modal');
   if (existing) existing.remove();
@@ -119,9 +106,7 @@ function showConfirmModal(blob, analysis) {
   modal.className = 'detection-modal';
 
   var imgUrl = URL.createObjectURL(blob);
-  var categoryEmoji = getCategoryEmoji(analysis ? analysis.trash_category : 'other');
   var categoryLabel = getCategoryLabel(analysis ? analysis.trash_category : 'other');
-  var impact = analysis ? analysis.pollution_impact : 0;
 
   modal.innerHTML =
     '<div class="detection-modal-card trash-card">' +
@@ -134,8 +119,7 @@ function showConfirmModal(blob, analysis) {
         '<div class="detection-badge trash-badge">' + categoryLabel + '</div>' +
       '</div>' +
       (analysis ? '<p class="detection-modal-desc">' + (analysis.description || '') + '</p>' : '') +
-      buildObjectsList(analysis ? analysis.objects : [], true) +
-      (analysis ? buildImpactBar(impact) : '') +
+      buildObjectsList(analysis ? analysis.objects : []) +
       '<div class="detection-modal-actions">' +
         '<button class="detection-btn detection-btn-cancel" onclick="cancelCapture()">취소</button>' +
         '<button class="detection-btn detection-btn-save" onclick="confirmCapture()">저장하기</button>' +
@@ -145,12 +129,11 @@ function showConfirmModal(blob, analysis) {
   document.body.appendChild(modal);
   setTimeout(function() { modal.classList.add('show'); }, 10);
 
-  // 바운딩박스 렌더링 — 모달 표시 + 이미지 로드 후
+  // 바운딩박스 렌더링
   if (analysis && analysis.objects && analysis.objects.length > 0) {
     var img = document.getElementById('detection-img');
     if (img) {
       var doBboxRender = function() {
-        // 모달 애니메이션 후 실제 크기가 잡힌 뒤 렌더링
         setTimeout(function() {
           renderBoundingBoxes(analysis.objects);
         }, 400);
@@ -164,14 +147,13 @@ function showConfirmModal(blob, analysis) {
   }
 }
 
-/* ─── 바운딩박스 렌더링 (이미지 contain 영역에 맞춤) ─── */
+/* ─── 바운딩박스 렌더링 ─── */
 function renderBoundingBoxes(objects) {
   var container = document.getElementById('detection-bbox-container');
   var img = document.getElementById('detection-img');
   if (!container || !img) return;
   container.innerHTML = '';
 
-  // 이미지 실제 표시 영역 계산 (object-fit: contain)
   var wrap = img.parentElement;
   var wrapW = wrap.offsetWidth;
   var wrapH = wrap.offsetHeight;
@@ -184,7 +166,6 @@ function renderBoundingBoxes(objects) {
   var offsetX = (wrapW - dispW) / 2;
   var offsetY = (wrapH - dispH) / 2;
 
-  // bbox 컨테이너를 이미지 표시 영역에 정확히 맞춤
   container.style.left = offsetX + 'px';
   container.style.top = offsetY + 'px';
   container.style.width = dispW + 'px';
@@ -194,7 +175,6 @@ function renderBoundingBoxes(objects) {
     var obj = objects[i];
     if (!obj.bbox || obj.bbox.length < 4) continue;
 
-    // bbox: [x_min, y_min, x_max, y_max] (0~1000 정규화)
     var x1 = obj.bbox[0] / 1000;
     var y1 = obj.bbox[1] / 1000;
     var x2 = obj.bbox[2] / 1000;
@@ -217,8 +197,8 @@ function renderBoundingBoxes(objects) {
   }
 }
 
-/* ─── 오브젝트 리스트 빌드 ─── */
-function buildObjectsList(objects, isTrash) {
+/* ─── 오브젝트 리스트 ─── */
+function buildObjectsList(objects) {
   if (!objects || objects.length === 0) return '';
 
   var html = '<div class="detection-objects-list">';
@@ -239,29 +219,7 @@ function buildObjectsList(objects, isTrash) {
   return html;
 }
 
-/* ─── 오염 영향도 바 ─── */
-function buildImpactBar(impact) {
-  var pct = Math.min(impact * 10, 100);
-  var impactClass = impact >= 7 ? 'impact-high' : impact >= 4 ? 'impact-mid' : 'impact-low';
-  return '' +
-    '<div class="detection-impact">' +
-      '<span class="detection-impact-label">오염 영향도</span>' +
-      '<div class="detection-impact-bar">' +
-        '<div class="detection-impact-fill ' + impactClass + '" style="width:' + pct + '%"></div>' +
-      '</div>' +
-      '<span class="detection-impact-num">' + impact + '/10</span>' +
-    '</div>';
-}
-
-/* ─── 카테고리 이모지/라벨 ─── */
-function getCategoryEmoji(cat) {
-  var map = {
-    plastic: '🧴', paper: '📄', glass: '🫙', metal: '🥫',
-    organic: '🍂', cigarette: '🚬', other: '🗑️', none: '✨'
-  };
-  return map[cat] || '🗑️';
-}
-
+/* ─── 카테고리 라벨 (이모지 없음) ─── */
 function getCategoryLabel(cat) {
   var map = {
     plastic: '플라스틱', paper: '종이', glass: '유리', metal: '금속',
@@ -280,7 +238,6 @@ function closeDetectionModal() {
   _pendingCapture = null;
 }
 
-/* ─── 취소 ─── */
 function cancelCapture() {
   closeDetectionModal();
 }
@@ -297,25 +254,18 @@ async function confirmCapture() {
   }
 
   try {
-    // 1. Storage 업로드
     var storagePath = await uploadPhoto(data.blob);
-
-    // 2. DB에 메타데이터 저장
     var photoMeta = await savePhotoMeta({
       storagePath: storagePath,
       latitude: data.loc.latitude,
       longitude: data.loc.longitude
     });
 
-    // 3. 분석 결과 업데이트
     if (photoMeta && data.analysis) {
       await updatePhotoAnalysis(photoMeta.id, data.analysis);
     }
 
-    // 4. 갤러리 새로고침
     await refreshGallery();
-
-    // 5. 모달 닫기
     closeDetectionModal();
 
   } catch (err) {
@@ -327,13 +277,12 @@ async function confirmCapture() {
   }
 }
 
-/* ─── Blob → Base64 변환 ─── */
+/* ─── Blob → Base64 ─── */
 function blobToBase64(blob) {
   return new Promise(function(resolve, reject) {
     var reader = new FileReader();
     reader.onload = function() {
-      var base64 = reader.result.split(',')[1];
-      resolve(base64);
+      resolve(reader.result.split(',')[1]);
     };
     reader.onerror = reject;
     reader.readAsDataURL(blob);
@@ -347,7 +296,7 @@ async function refreshGallery() {
   renderGallery(photos);
 }
 
-/* ─── 갤러리 렌더링 ─── */
+/* ─── 갤러리 렌더링 (클릭으로 삭제) ─── */
 function renderGallery(photos) {
   var scrollEl = document.getElementById('gallery-scroll');
   var emptyEl = document.getElementById('gallery-empty');
@@ -367,18 +316,18 @@ function renderGallery(photos) {
     var url = getPhotoUrl(p.storage_path);
     var label = p.trash_category || '';
     html +=
-      '<div class="gallery-card">' +
+      '<div class="gallery-card" onclick="onGalleryCardTap(\'' + p.id + '\')">' +
         '<img src="' + url + '" alt="사진" loading="lazy">' +
         (label ? '<div class="gallery-card-label">' + getCategoryLabel(label) + '</div>' : '') +
-        '<button class="gallery-card-delete" onclick="onDeletePhoto(\'' + p.id + '\')">&times;</button>' +
       '</div>';
   }
   scrollEl.innerHTML = html;
 }
 
-/* ─── 사진 삭제 핸들러 ─── */
-async function onDeletePhoto(photoId) {
-  if (!confirm('이 사진을 삭제할까요?')) return;
-  await deletePhoto(photoId);
-  await refreshGallery();
+/* ─── 갤러리 카드 탭 → 삭제 확인 ─── */
+async function onGalleryCardTap(photoId) {
+  if (confirm('이 사진을 삭제할까요?')) {
+    await deletePhoto(photoId);
+    await refreshGallery();
+  }
 }

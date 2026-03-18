@@ -1,18 +1,16 @@
 /* ========================================
-   차트 추가 스타일
+   차트 스타일
    ======================================== */
 
-/* Chart.js 캔버스 반응형 */
 .chart-box {
   position: relative;
 }
 
-/* 차트 없을 때 */
 .chart-empty {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 120px;
-  color: var(--color-titanium);
+  color: var(--color-tertiary);
   font-size: var(--font-size-sm);
 }

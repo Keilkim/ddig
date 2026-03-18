@@ -13,9 +13,5 @@ var _HTML_HISTORY_VIEW = '' +
         '<h4 class="chart-label">수거 추이</h4>' +
         '<canvas id="chart-history-trend"></canvas>' +
       '</div>' +
-      '<div class="stat-card wide">' +
-        '<span class="stat-label">기간 오염도 저감</span>' +
-        '<span id="history-pollution" class="stat-value pollution-badge">-</span>' +
-      '</div>' +
     '</div>' +
   '</div>';

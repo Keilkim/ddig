@@ -1,20 +1,20 @@
 /* ========================================
-   공통 버튼 Styles — 플로깅 감성
+   버튼 — Apple 스타일
    ======================================== */
 
-/* 대쉬보드 뷰의 버튼 그룹 */
 #view-dashboard .btn-group {
-  background: var(--color-white);
-  border-top: 1px solid #f0f0f0;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.04);
+  background: var(--color-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 0.5px solid var(--color-separator);
 }
 
 #view-dashboard .btn-group-item {
-  color: var(--color-charcoal);
-  border-radius: var(--radius-md);
+  color: var(--color-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
 }
 
 #view-dashboard .btn-group-item:active {
-  color: var(--color-mint);
-  background: var(--color-mint-bg);
+  color: var(--color-green);
 }

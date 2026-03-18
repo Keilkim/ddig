@@ -1,22 +1,24 @@
 /* ========================================
-   대쉬보드 — 100vh 고정, 내부만 스크롤
+   대쉬보드 — Apple 카드 스타일
    ======================================== */
 
 #view-dashboard {
-  background: var(--color-off-white);
-  color: var(--color-ink);
+  background: var(--color-bg);
+  color: var(--color-label);
 }
 
 #view-dashboard .title-bar {
-  background: linear-gradient(135deg, var(--color-off-white), var(--color-mint-bg));
-  color: var(--color-ink);
+  background: var(--color-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 0.5px solid var(--color-separator);
 }
 
 #view-dashboard .title-bar-text {
-  color: var(--color-ink);
+  color: var(--color-label);
 }
 
-/* 대쉬보드 컨텐츠 — flex:1 내부 스크롤 */
+/* 대쉬보드 컨텐츠 — 내부 스크롤 */
 .dashboard-display {
   flex: 1;
   overflow-y: auto;
@@ -28,11 +30,11 @@
 .dashboard-date-label {
   text-align: center;
   font-size: var(--font-size-xs);
-  color: var(--color-leaf);
+  color: var(--color-green);
   font-weight: 600;
   margin-bottom: var(--space-md);
   padding: 4px 14px;
-  background: var(--color-mint-bg);
+  background: var(--color-green-light);
   border-radius: var(--radius-pill);
   display: block;
   width: fit-content;
@@ -60,31 +62,32 @@
 .route-map {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  background: var(--color-mint-bg);
-  box-shadow: var(--shadow-md);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
 }
 
 .distance-display {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px var(--space-md);
+  padding: 10px var(--space-md);
   background: var(--color-white);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
 }
 
 .distance-label {
-  font-size: var(--font-size-xs);
-  color: var(--color-titanium-dark);
+  font-size: var(--font-size-sm);
+  color: var(--color-secondary);
 }
 
 .distance-value {
   font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-mint);
+  font-weight: 700;
+  color: var(--color-green);
+  font-variant-numeric: tabular-nums;
 }
 
 .chart-col {
@@ -97,36 +100,37 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px var(--space-md);
+  padding: 10px var(--space-md);
   background: var(--color-white);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
 }
 .stat-card.wide { width: 100%; }
 
 .stat-label {
-  font-size: var(--font-size-xs);
-  color: var(--color-titanium-dark);
+  font-size: var(--font-size-sm);
+  color: var(--color-secondary);
 }
 
 .stat-value {
   font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-ink);
+  font-weight: 700;
+  color: var(--color-label);
+  font-variant-numeric: tabular-nums;
 }
 
 .pollution-badge {
   font-size: var(--font-size-sm);
   padding: 3px 10px;
-  background: linear-gradient(135deg, var(--color-leaf), var(--color-mint));
-  color: var(--color-white);
+  background: var(--color-green);
+  color: #fff;
   border-radius: var(--radius-pill);
   font-weight: 600;
 }
 
 .chart-box {
   background: var(--color-white);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: var(--space-md);
   box-shadow: var(--shadow-sm);
 }
@@ -138,23 +142,23 @@
 
 .chart-label {
   font-size: var(--font-size-xs);
-  color: var(--color-leaf-dark);
+  color: var(--color-secondary);
   margin-bottom: var(--space-sm);
-  font-weight: var(--font-weight-medium);
+  font-weight: 500;
 }
 
-/* 히스토리 — 대쉬보드 내부 스크롤에 포함 */
+/* 히스토리 */
 .history-section {
   padding: var(--space-md) 0;
-  border-top: 1px solid #f0f0f0;
+  border-top: 0.5px solid var(--color-separator);
 }
 
 .history-title {
-  font-family: var(--font-primary);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
   margin-bottom: var(--space-md);
-  color: var(--color-leaf-dark);
+  color: var(--color-label);
+  letter-spacing: -0.02em;
 }
 
 .history-charts {
@@ -165,7 +169,7 @@
 
 .filter-bar {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   overflow-x: auto;
   padding-bottom: var(--space-sm);
   margin-bottom: var(--space-md);
@@ -175,34 +179,33 @@
 
 .filter-btn {
   flex-shrink: 0;
-  padding: 4px 12px;
+  padding: 6px 14px;
   border-radius: var(--radius-pill);
   background: var(--color-white);
-  color: var(--color-charcoal);
+  color: var(--color-secondary);
   font-size: var(--font-size-xs);
   box-shadow: var(--shadow-sm);
   font-weight: 500;
 }
 
 .filter-btn.filter-active {
-  background: linear-gradient(135deg, var(--color-leaf), var(--color-mint));
+  background: var(--color-green);
   color: #fff;
-  box-shadow: 0 3px 10px rgba(107, 175, 123, 0.2);
 }
 
-/* 대쉬보드 하단 버튼 */
+/* 대쉬보드 하단 탭바 */
 #view-dashboard .btn-group {
-  background: var(--color-white);
-  border-top: 1px solid #f0f0f0;
-  box-shadow: 0 -2px 12px rgba(0,0,0,0.03);
+  background: var(--color-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 0.5px solid var(--color-separator);
   flex-shrink: 0;
 }
 
 #view-dashboard .btn-group-item {
-  color: var(--color-charcoal);
+  color: var(--color-secondary);
 }
 
 #view-dashboard .btn-group-item:active {
-  color: var(--color-mint);
-  background: var(--color-mint-bg);
+  color: var(--color-green);
 }

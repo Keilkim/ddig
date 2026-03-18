@@ -1,5 +1,5 @@
 /* ========================================
-   팝업/모달 — 컴팩트, 이모지 없음
+   팝업/모달 — Apple Sheet 스타일
    ======================================== */
 
 /* 권한 팝업 */
@@ -7,55 +7,56 @@
   text-align: center;
   padding: var(--space-xl);
   border-radius: var(--radius-xl);
-  max-width: 320px;
+  max-width: 300px;
 }
 
 .permission-title {
-  font-family: var(--font-display);
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-ink);
-  letter-spacing: 0.1em;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-label);
+  letter-spacing: -0.02em;
 }
 
 .permission-subtitle {
-  font-family: var(--font-display);
   font-size: var(--font-size-sm);
-  color: var(--color-leaf);
-  letter-spacing: 0.2em;
+  color: var(--color-secondary);
+  letter-spacing: 0.1em;
   margin-bottom: var(--space-lg);
+  text-transform: uppercase;
 }
 
 .permission-message {
   font-size: var(--font-size-sm);
-  color: var(--color-charcoal);
-  line-height: 1.7;
+  color: var(--color-secondary);
+  line-height: 1.6;
   margin-bottom: var(--space-lg);
 }
 
 .permission-buttons {
   display: flex;
-  gap: var(--space-md);
+  flex-direction: column;
+  gap: 1px;
+  background: var(--color-separator);
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 
 .btn-reject,
 .btn-approve {
-  flex: 1;
-  padding: 10px;
-  border-radius: var(--radius-pill);
+  padding: 14px;
   font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
+  font-weight: 400;
+  background: var(--color-white);
+  border-radius: 0;
 }
 
 .btn-reject {
-  background: var(--color-titanium-light);
-  color: var(--color-charcoal);
+  color: var(--color-secondary);
 }
 
 .btn-approve {
-  background: linear-gradient(135deg, var(--color-leaf), var(--color-mint));
-  color: #fff;
-  box-shadow: 0 3px 12px rgba(107, 175, 123, 0.25);
+  color: var(--color-blue);
+  font-weight: 600;
 }
 
 /* 캘린더 팝업 */
@@ -74,21 +75,21 @@
 }
 
 .cal-month-label {
-  font-family: var(--font-display);
   font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .cal-nav-btn {
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-circle);
-  background: var(--color-mint-bg);
+  border-radius: 50%;
+  background: var(--color-fill);
   font-size: var(--font-size-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-leaf);
+  color: var(--color-label);
 }
 
 .calendar-weekdays {
@@ -96,14 +97,16 @@
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
   font-size: var(--font-size-xs);
-  color: var(--color-titanium-dark);
+  color: var(--color-secondary);
   margin-bottom: var(--space-sm);
+  font-weight: 500;
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 2px;
+  margin-bottom: var(--space-sm);
 }
 
 .cal-day {
@@ -113,20 +116,20 @@
   align-items: center;
   justify-content: center;
   font-size: var(--font-size-sm);
-  border-radius: 12px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.15s ease;
   position: relative;
 }
 
-.cal-day:hover { background: var(--color-mint-bg); }
-.cal-day.today { font-weight: var(--font-weight-bold); color: var(--color-mint); }
+.cal-day:hover { background: var(--color-fill); }
+.cal-day.today { font-weight: 700; color: var(--color-blue); }
 .cal-day.has-activity {
-  background: linear-gradient(135deg, var(--color-mint-light), var(--color-leaf));
+  background: var(--color-green);
   color: #fff;
   font-weight: 600;
 }
-.cal-day.other-month { color: var(--color-titanium-light); }
+.cal-day.other-month { color: var(--color-tertiary); }
 
 .cal-day-count {
   font-size: 7px;
@@ -138,24 +141,24 @@
   display: flex;
   gap: var(--space-md);
   justify-content: center;
-  margin-top: var(--space-md);
+  margin-top: var(--space-sm);
   font-size: var(--font-size-xs);
-  color: var(--color-titanium-dark);
+  color: var(--color-secondary);
 }
 
 .legend-item { display: flex; align-items: center; gap: var(--space-xs); }
-.legend-dot { width: 7px; height: 7px; border-radius: var(--radius-circle); }
-.active-dot { background: var(--color-leaf); }
+.legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+.active-dot { background: var(--color-green); }
 
 .cal-close-btn {
   display: block;
   width: 100%;
   margin-top: var(--space-md);
-  padding: 8px;
-  background: var(--color-mint-bg);
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-sm);
-  color: var(--color-leaf);
+  padding: 12px;
+  background: var(--color-fill);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  color: var(--color-blue);
   font-weight: 600;
 }
 
@@ -169,11 +172,12 @@
 }
 
 .ai-popup-title {
-  font-family: var(--font-display);
   font-size: var(--font-size-xl);
+  font-weight: 700;
   text-align: center;
   margin-bottom: var(--space-lg);
-  color: var(--color-leaf-dark);
+  color: var(--color-label);
+  letter-spacing: -0.02em;
 }
 
 .ai-loading {
@@ -181,34 +185,33 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-md);
-  padding: var(--space-2xl) 0;
-  color: var(--color-titanium-dark);
+  padding: 40px 0;
+  color: var(--color-secondary);
   font-size: var(--font-size-sm);
 }
 
 .ai-result {
   font-size: var(--font-size-sm);
   line-height: 1.7;
-  color: var(--color-charcoal);
+  color: var(--color-label);
 }
 
 .ai-result h3 {
-  font-family: var(--font-primary);
   font-size: var(--font-size-md);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   margin-top: var(--space-lg);
   margin-bottom: var(--space-sm);
-  color: var(--color-leaf-dark);
+  color: var(--color-label);
 }
 
 .ai-close-btn {
   display: block;
   width: 100%;
   margin-top: var(--space-lg);
-  padding: 8px;
-  background: var(--color-mint-bg);
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-sm);
-  color: var(--color-leaf);
+  padding: 14px;
+  background: var(--color-fill);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  color: var(--color-blue);
   font-weight: 600;
 }

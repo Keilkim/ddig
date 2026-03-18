@@ -1,70 +1,55 @@
 /* ========================================
-   DIGG X GONGSIM — Base Styles
-   한 화면 고정, 스크롤 없는 모바일 UI
+   DIGG X GONGSIM — Apple-style Base
+   깔끔, 미니멀, 한 화면 고정
    ======================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --font-primary: 'Noto Sans KR', sans-serif;
-  --font-display: 'Playfair Display', serif;
-  --font-size-xs: 0.7rem;
-  --font-size-sm: 0.8rem;
-  --font-size-md: 0.9rem;
-  --font-size-lg: 1.1rem;
-  --font-size-xl: 1.3rem;
-  --font-size-2xl: 1.8rem;
-  --font-size-3xl: 2.2rem;
-  --font-weight-light: 300;
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-bold: 700;
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-md: 15px;
+  --font-size-lg: 17px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 34px;
 
-  --color-titanium: #C4C4C4;
-  --color-titanium-light: #E8E8E8;
-  --color-titanium-dark: #8A8A8A;
+  --color-bg: #F2F2F7;
   --color-white: #FFFFFF;
-  --color-off-white: #F9F7F2;
-  --color-charcoal: #2C2C2C;
-  --color-ink: #1A1A1A;
+  --color-label: #000000;
+  --color-secondary: #8E8E93;
+  --color-tertiary: #C7C7CC;
+  --color-separator: rgba(60, 60, 67, 0.12);
+  --color-fill: rgba(120, 120, 128, 0.12);
 
-  --color-mint: #4ecdc4;
-  --color-mint-light: #a8e6cf;
-  --color-mint-bg: #e8f8f5;
-  --color-leaf: #6baf7b;
-  --color-leaf-dark: #4a8c5c;
+  --color-green: #34C759;
+  --color-green-light: rgba(52, 199, 89, 0.12);
+  --color-blue: #007AFF;
+  --color-red: #FF3B30;
+  --color-orange: #FF9500;
+  --color-teal: #5AC8FA;
+  --color-mint: #00C7BE;
 
-  --color-accent: #4ecdc4;
-  --color-accent-green: #6BAF7B;
-  --color-accent-red: #ff6b6b;
-  --color-success: #6BAF7B;
-  --color-warning: #f0932b;
-  --color-error: #ff6b6b;
-  --color-overlay: rgba(26, 26, 26, 0.5);
-  --color-glass: rgba(255, 255, 255, 0.9);
+  --color-overlay: rgba(0, 0, 0, 0.4);
+  --color-glass: rgba(255, 255, 255, 0.72);
+  --color-glass-dark: rgba(28, 28, 30, 0.72);
 
   --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
   --radius-pill: 999px;
-  --radius-circle: 50%;
 
   --space-xs: 4px;
-  --space-sm: 6px;
-  --space-md: 12px;
-  --space-lg: 18px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 20px;
   --space-xl: 24px;
-  --space-2xl: 36px;
 
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.05);
-  --shadow-md: 0 3px 12px rgba(0,0,0,0.07);
-  --shadow-lg: 0 6px 24px rgba(0,0,0,0.1);
-  --shadow-xl: 0 12px 40px rgba(0,0,0,0.12);
-
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-bounce: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 2px 10px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
 }
 
 *, *::before, *::after {
@@ -83,22 +68,16 @@ html, body {
 
 body {
   font-family: var(--font-primary);
-  font-weight: var(--font-weight-regular);
-  color: var(--color-ink);
-  background: var(--color-off-white);
-  line-height: 1.5;
+  font-weight: 400;
+  color: var(--color-label);
+  background: var(--color-bg);
+  line-height: 1.47;
   -webkit-font-smoothing: antialiased;
-}
-
-h1, h2, h3 {
-  font-family: var(--font-display);
-  font-weight: var(--font-weight-bold);
-  line-height: 1.2;
 }
 
 .hidden { display: none !important; }
 
-/* 뷰 컨테이너 — 100vh 고정 */
+/* 뷰 컨테이너 — 100dvh 고정 */
 .view-container {
   display: none;
   width: 100%;
@@ -113,25 +92,20 @@ h1, h2, h3 {
 
 button, .btn {
   font-family: var(--font-primary);
-  font-weight: var(--font-weight-medium);
+  font-weight: 500;
   border: none;
   cursor: pointer;
-  transition: all var(--transition-normal);
+  transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   user-select: none;
 }
 
 button:active, .btn:active {
-  transform: scale(0.96);
+  opacity: 0.7;
 }
 
-::-webkit-scrollbar { width: 3px; height: 3px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: var(--color-mint);
-  border-radius: var(--radius-pill);
-}
+::-webkit-scrollbar { width: 0; height: 0; }
 
 .safe-area-top { padding-top: env(safe-area-inset-top); }
 .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
@@ -145,14 +119,14 @@ button:active, .btn:active {
   z-index: 1000;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 .popup-overlay.active { display: flex; }
 .popup-content {
   background: var(--color-white);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-lg);
   max-width: 90vw;
   max-height: 85vh;
   overflow-y: auto;
@@ -160,11 +134,11 @@ button:active, .btn:active {
 }
 
 .spinner {
-  width: 28px;
-  height: 28px;
-  border: 3px solid var(--color-mint-light);
-  border-top-color: var(--color-mint);
-  border-radius: var(--radius-circle);
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid var(--color-fill);
+  border-top-color: var(--color-green);
+  border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
