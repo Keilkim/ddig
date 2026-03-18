@@ -1,6 +1,6 @@
 /* ========================================
    DIGG X GONGSIM — Base Styles
-   구겐하임 미술관 + 프랑크 게리 UI
+   플로깅 감성 — 자연친화적 & 아기자기
    ======================================== */
 
 /* --- Google Fonts --- */
@@ -23,39 +23,48 @@
   --font-weight-medium: 500;
   --font-weight-bold: 700;
 
-  /* Colors — Titanium / Museum palette */
+  /* Colors — 자연 팔레트 */
   --color-titanium: #C4C4C4;
   --color-titanium-light: #E8E8E8;
   --color-titanium-dark: #8A8A8A;
   --color-white: #FFFFFF;
-  --color-off-white: #F7F5F0;
+  --color-off-white: #F9F7F2;
   --color-warm-gray: #B8B0A4;
   --color-concrete: #D9D3CB;
   --color-charcoal: #2C2C2C;
   --color-ink: #1A1A1A;
-  --color-accent: #4A90D9;
+
+  /* 플로깅 그린/민트 포인트 */
+  --color-mint: #4ecdc4;
+  --color-mint-light: #a8e6cf;
+  --color-mint-bg: #e8f8f5;
+  --color-leaf: #6baf7b;
+  --color-leaf-dark: #4a8c5c;
+  --color-earth: #c4a882;
+  --color-sky: #87ceeb;
+  --color-sunset: #ffd4a2;
+
+  --color-accent: #4ecdc4;
   --color-accent-warm: #D4956A;
   --color-accent-green: #6BAF7B;
-  --color-accent-red: #D46B6B;
+  --color-accent-red: #ff6b6b;
   --color-success: #6BAF7B;
-  --color-warning: #D4A56A;
-  --color-error: #D46B6B;
-  --color-overlay: rgba(26, 26, 26, 0.6);
-  --color-glass: rgba(255, 255, 255, 0.85);
+  --color-warning: #f0932b;
+  --color-error: #ff6b6b;
+  --color-overlay: rgba(26, 26, 26, 0.5);
+  --color-glass: rgba(255, 255, 255, 0.9);
 
   /* Gradients */
-  --gradient-titanium: linear-gradient(135deg, #E8E8E8 0%, #C4C4C4 50%, #A8A8A8 100%);
-  --gradient-warm: linear-gradient(135deg, #F7F5F0 0%, #E8E2D8 100%);
-  --gradient-gehry: linear-gradient(160deg, #F0EDE8 0%, #D9D3CB 40%, #C4C4C4 100%);
+  --gradient-nature: linear-gradient(135deg, #a8e6cf 0%, #88d8b0 50%, #6baf7b 100%);
+  --gradient-warm: linear-gradient(135deg, #F9F7F2 0%, #f0ebe0 100%);
+  --gradient-sky: linear-gradient(180deg, #e0f4ff 0%, #F9F7F2 100%);
+  --gradient-sunset: linear-gradient(135deg, #ffd4a2 0%, #ffb380 100%);
 
-  /* Border Radius — Gehry organic curves */
-  --radius-sm: 8px;
+  /* Border Radius — 부드러운 곡선 */
+  --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-xl: 32px;
-  --radius-gehry: 40% 60% 55% 45% / 55% 40% 60% 45%;
-  --radius-organic1: 30% 70% 60% 40% / 50% 60% 40% 50%;
-  --radius-organic2: 60% 40% 45% 55% / 40% 55% 60% 45%;
   --radius-pill: 999px;
   --radius-circle: 50%;
 
@@ -68,20 +77,19 @@
   --space-2xl: 48px;
   --space-3xl: 64px;
 
-  /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
-  --shadow-inner: inset 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-gehry: 4px 6px 20px rgba(0, 0, 0, 0.1), -2px -3px 15px rgba(255, 255, 255, 0.5);
+  /* Shadows — 부드러운 그림자 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12);
+  --shadow-inner: inset 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 20px rgba(78, 205, 196, 0.15);
 
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  --transition-gehry: 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* --- Reset --- */
@@ -156,7 +164,7 @@ button:active, .btn:active {
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-titanium);
+  background: var(--color-mint);
   border-radius: var(--radius-pill);
 }
 
@@ -181,7 +189,7 @@ button:active, .btn:active {
 }
 .popup-content {
   background: var(--color-white);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-xl);
   max-width: 90vw;
   max-height: 85vh;
@@ -193,8 +201,8 @@ button:active, .btn:active {
 .spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid var(--color-titanium-light);
-  border-top-color: var(--color-accent);
+  border: 3px solid var(--color-mint-light);
+  border-top-color: var(--color-mint);
   border-radius: var(--radius-circle);
   animation: spin 0.8s linear infinite;
 }

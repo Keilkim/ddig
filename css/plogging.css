@@ -11,7 +11,7 @@
 .title-bar {
   padding: var(--space-md) var(--space-lg);
   text-align: center;
-  background: rgba(0, 0, 0, 0.3);
+  background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 100%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   z-index: 10;
@@ -27,7 +27,7 @@
 
 .title-bar-x {
   font-weight: var(--font-weight-light);
-  color: var(--color-titanium);
+  color: var(--color-mint);
 }
 
 /* 카메라 컨테이너 */
@@ -64,7 +64,7 @@
   justify-content: space-around;
   padding: var(--space-md) var(--space-lg);
   padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
-  background: rgba(0, 0, 0, 0.3);
+  background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -78,142 +78,376 @@
   color: var(--color-white);
   padding: var(--space-sm);
   min-width: 60px;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.btn-group-item:active {
+  background: rgba(255,255,255,0.1);
 }
 
 .btn-icon { font-size: 24px; }
-.btn-label { font-size: var(--font-size-xs); }
+.btn-label { font-size: var(--font-size-xs); opacity: 0.8; }
 
-/* 촬영 버튼 (중앙 원형) */
+/* 촬영 버튼 (중앙 원형) — 귀여운 그린 링 */
 .btn-capture {
-  width: 68px;
-  height: 68px;
+  width: 72px;
+  height: 72px;
   border-radius: var(--radius-circle);
   background: var(--color-white);
   position: relative;
   padding: 0;
+  box-shadow: 0 0 0 4px rgba(107, 175, 123, 0.4);
+  transition: all var(--transition-normal);
+}
+
+.btn-capture:active {
+  box-shadow: 0 0 0 8px rgba(107, 175, 123, 0.3);
+  transform: scale(0.92);
 }
 
 .btn-capture-ring {
   display: block;
-  width: 58px;
-  height: 58px;
+  width: 60px;
+  height: 60px;
   border-radius: var(--radius-circle);
-  border: 3px solid var(--color-ink);
+  border: 3px solid var(--color-accent-green);
   background: var(--color-white);
   transition: all var(--transition-fast);
 }
 
 .btn-capture:active .btn-capture-ring {
-  width: 50px;
-  height: 50px;
-  background: var(--color-titanium-light);
+  width: 52px;
+  height: 52px;
+  background: var(--color-mint-light);
+  border-color: var(--color-accent-green);
 }
 
-/* ─── 쓰레기 아님 토스트 ─── */
-.not-trash-toast {
-  position: fixed;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-20px);
-  background: rgba(0, 0, 0, 0.85);
-  color: #fff;
-  padding: 14px 24px;
-  border-radius: 14px;
-  font-size: 14px;
-  line-height: 1.5;
-  text-align: center;
-  z-index: 9999;
-  opacity: 0;
-  transition: opacity 0.3s, transform 0.3s;
-  pointer-events: none;
-  max-width: 80vw;
-  backdrop-filter: blur(10px);
-}
-
-.not-trash-toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* ─── Detection 오버레이 ─── */
-.detection-overlay {
+/* ─── 분석 중 오버레이 ─── */
+.analyzing-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.analyzing-content {
+  text-align: center;
+  color: #fff;
+}
+
+.analyzing-spinner {
+  width: 64px;
+  height: 64px;
+  border: 4px solid rgba(255,255,255,0.2);
+  border-top-color: var(--color-mint);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+.analyzing-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  animation: bounce-soft 1s ease-in-out infinite;
+}
+
+.analyzing-text {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.analyzing-sub {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+@keyframes bounce-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ─── 확인 모달 ─── */
+.detection-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
   z-index: 9998;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
-.detection-overlay img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+.detection-modal.show {
+  opacity: 1;
 }
 
-.detection-box-container {
+.detection-modal-card {
+  background: #fff;
+  border-radius: 28px 28px 0 0;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px 20px;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.detection-modal.show .detection-modal-card {
+  transform: translateY(0);
+}
+
+.detection-modal-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.detection-modal-emoji {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.detection-modal-title {
+  font-family: var(--font-primary);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+/* 이미지 + 바운딩박스 래퍼 */
+.detection-modal-img-wrap {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background: #f0f0f0;
+}
+
+.detection-modal-img {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+}
+
+.detection-bbox-container {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.detection-box-container > .detection-box {
+.detection-bbox {
   position: absolute;
+  border: 2.5px solid #ff6b6b;
+  border-radius: 8px;
+  background: rgba(255, 107, 107, 0.12);
+  animation: bbox-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.detection-box {
-  border: 2px solid;
-  border-radius: 4px;
-}
-
-.detection-box-trash {
-  border-color: #ff4444;
-  background: rgba(255, 68, 68, 0.15);
-}
-
-.detection-box-clean {
-  border-color: #44cc44;
-  background: rgba(68, 204, 68, 0.15);
-}
-
-.detection-label {
+.detection-bbox-label {
   position: absolute;
-  top: -22px;
-  left: 0;
-  background: inherit;
+  top: -24px;
+  left: -1px;
+  background: #ff6b6b;
   color: #fff;
   font-size: 11px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px 8px 8px 0;
   white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 
-.detection-box-trash .detection-label {
-  background: #ff4444;
+@keyframes bbox-pop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-.detection-box-clean .detection-label {
-  background: #44cc44;
-}
-
-.detection-close {
+/* 배지 */
+.detection-badge {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  top: 12px;
+  right: 12px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(8px);
+}
+
+.trash-badge {
+  background: rgba(255, 107, 107, 0.9);
   color: #fff;
-  font-size: 18px;
+}
+
+.not-trash-badge {
+  background: rgba(107, 175, 123, 0.9);
+  color: #fff;
+}
+
+/* 설명 텍스트 */
+.detection-modal-desc {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: var(--color-off-white);
+  border-radius: 12px;
+}
+
+/* 오브젝트 리스트 */
+.detection-objects-list {
+  margin-bottom: 16px;
+}
+
+.detection-object-item {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detection-object-item:last-child {
+  border-bottom: none;
+}
+
+.detection-object-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+  min-width: 70px;
+}
+
+.detection-conf-bar {
+  flex: 1;
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.detection-conf-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.conf-high { background: linear-gradient(90deg, #6baf7b, #4ecdc4); }
+.conf-mid { background: linear-gradient(90deg, #f9ca24, #f0932b); }
+.conf-low { background: linear-gradient(90deg, #ff6b6b, #ee5a24); }
+
+.detection-conf-num {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-titanium-dark);
+  min-width: 36px;
+  text-align: right;
+}
+
+/* 오염 영향도 */
+.detection-impact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #fff5f5;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.detection-impact-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  min-width: 70px;
+}
+
+.detection-impact-bar {
+  flex: 1;
+  height: 10px;
+  background: #ffe0e0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.detection-impact-fill {
+  height: 100%;
+  border-radius: 5px;
+}
+
+.impact-high { background: linear-gradient(90deg, #ff6b6b, #c0392b); }
+.impact-mid { background: linear-gradient(90deg, #f0932b, #f9ca24); }
+.impact-low { background: linear-gradient(90deg, #6baf7b, #a8e6cf); }
+
+.detection-impact-num {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ff6b6b;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* 액션 버튼 */
+.detection-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.detection-btn {
+  flex: 1;
+  padding: 14px;
   border: none;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  z-index: 1;
+  transition: all var(--transition-normal);
+}
+
+.detection-btn:active {
+  transform: scale(0.96);
+}
+
+.detection-btn-cancel {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.detection-btn-save {
+  background: linear-gradient(135deg, #6baf7b, #4ecdc4);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(107, 175, 123, 0.3);
+}
+
+.detection-btn-save:active {
+  box-shadow: 0 2px 8px rgba(107, 175, 123, 0.2);
+}
+
+.detection-btn-close {
+  background: linear-gradient(135deg, #a8e6cf, #88d8b0);
+  color: #fff;
+}
+
+/* ─── 쓰레기 아님 카드 특수 스타일 ─── */
+.not-trash-card .detection-modal-header {
+  padding: 8px 0;
+}
+
+.not-trash-card .detection-modal-title {
+  color: var(--color-accent-green);
 }

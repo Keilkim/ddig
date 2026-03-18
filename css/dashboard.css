@@ -1,5 +1,5 @@
 /* ========================================
-   대쉬보드-view Styles
+   대쉬보드-view Styles — 플로깅 감성
    ======================================== */
 
 #view-dashboard {
@@ -8,7 +8,7 @@
 }
 
 #view-dashboard .title-bar {
-  background: var(--gradient-gehry);
+  background: linear-gradient(135deg, var(--color-off-white) 0%, var(--color-mint-bg) 100%);
   color: var(--color-ink);
 }
 
@@ -27,8 +27,23 @@
 .dashboard-date-label {
   text-align: center;
   font-size: var(--font-size-sm);
-  color: var(--color-titanium-dark);
+  color: var(--color-leaf);
+  font-weight: 600;
   margin-bottom: var(--space-md);
+  padding: 6px 16px;
+  background: var(--color-mint-bg);
+  border-radius: var(--radius-pill);
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+}
+
+/* 날짜 라벨을 중앙 정렬하기 위한 래퍼 */
+.dashboard-display > .dashboard-date-label {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* 플로깅한 날: 2열 레이아웃 */
@@ -55,9 +70,9 @@
 .route-map {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: var(--radius-lg);
+  border-radius: 20px;
   overflow: hidden;
-  background: var(--color-titanium-light);
+  background: var(--color-mint-bg);
   box-shadow: var(--shadow-md);
 }
 
@@ -67,7 +82,7 @@
   align-items: center;
   padding: var(--space-sm) var(--space-md);
   background: var(--color-white);
-  border-radius: var(--radius-md);
+  border-radius: 14px;
   box-shadow: var(--shadow-sm);
 }
 
@@ -79,7 +94,7 @@
 .distance-value {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
-  color: var(--color-accent);
+  color: var(--color-mint);
 }
 
 /* 차트 영역 */
@@ -94,9 +109,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-sm) var(--space-md);
+  padding: 12px var(--space-md);
   background: var(--color-white);
-  border-radius: var(--radius-md);
+  border-radius: 14px;
   box-shadow: var(--shadow-sm);
 }
 
@@ -116,15 +131,16 @@
 .pollution-badge {
   font-size: var(--font-size-md);
   padding: var(--space-xs) var(--space-sm);
-  background: var(--color-accent-green);
+  background: linear-gradient(135deg, var(--color-leaf), var(--color-mint));
   color: var(--color-white);
   border-radius: var(--radius-pill);
+  font-weight: 600;
 }
 
 /* 차트 박스 */
 .chart-box {
   background: var(--color-white);
-  border-radius: var(--radius-md);
+  border-radius: 16px;
   padding: var(--space-md);
   box-shadow: var(--shadow-sm);
 }
@@ -136,7 +152,7 @@
 
 .chart-label {
   font-size: var(--font-size-xs);
-  color: var(--color-titanium-dark);
+  color: var(--color-leaf-dark);
   margin-bottom: var(--space-sm);
   font-family: var(--font-primary);
   font-weight: var(--font-weight-medium);
@@ -145,7 +161,7 @@
 /* 히스토리 섹션 */
 .history-section {
   padding: var(--space-md);
-  border-top: 1px solid var(--color-titanium-light);
+  border-top: 1px solid #f0f0f0;
 }
 
 .history-title {
@@ -153,6 +169,7 @@
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
   margin-bottom: var(--space-md);
+  color: var(--color-leaf-dark);
 }
 
 .history-charts {
@@ -164,7 +181,7 @@
 /* 필터 바 */
 .filter-bar {
   display: flex;
-  gap: var(--space-xs);
+  gap: 6px;
   overflow-x: auto;
   padding-bottom: var(--space-sm);
   margin-bottom: var(--space-md);
@@ -175,16 +192,18 @@
 
 .filter-btn {
   flex-shrink: 0;
-  padding: var(--space-xs) var(--space-md);
+  padding: 6px 14px;
   border-radius: var(--radius-pill);
   background: var(--color-white);
   color: var(--color-charcoal);
   font-size: var(--font-size-xs);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-fast);
+  font-weight: 500;
 }
 
 .filter-btn.filter-active {
-  background: var(--color-ink);
+  background: linear-gradient(135deg, var(--color-leaf), var(--color-mint));
   color: var(--color-white);
+  box-shadow: 0 4px 12px rgba(107, 175, 123, 0.25);
 }

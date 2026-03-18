@@ -6,7 +6,7 @@ var _HTML_GALLERY = '' +
       '<!-- 사진 카드가 동적으로 삽입됨 -->' +
     '</div>' +
     '<div id="gallery-empty" class="gallery-empty">' +
-      '<span class="gallery-empty-icon">📷</span>' +
-      '<span class="gallery-empty-text">촬영된 사진이 없습니다</span>' +
+      '<span class="gallery-empty-icon">🌱</span>' +
+      '<span class="gallery-empty-text">쓰레기를 찾아 촬영해보세요!</span>' +
     '</div>' +
   '</div>';
