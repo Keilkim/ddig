@@ -14,4 +14,8 @@ var _HTML_HISTORY_VIEW = '' +
         '<canvas id="chart-history-trend"></canvas>' +
       '</div>' +
     '</div>' +
+  '</div>' +
+  '<div class="collection-section">' +
+    '<h3 class="history-title">내 수집 목록</h3>' +
+    '<div id="collection-grid" class="collection-grid"></div>' +
   '</div>';

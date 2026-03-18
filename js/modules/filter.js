@@ -23,17 +23,6 @@ async function setFilter(periodKey) {
 /* ─── 필터링된 히스토리 로드 & 렌더 ─── */
 async function loadFilteredHistory(periodKey) {
   var photos = await loadPhotosByPeriod(periodKey);
-
-  // 기간 오염도 저감
-  var pollutionEl = document.getElementById('history-pollution');
-  if (pollutionEl) {
-    var total = 0;
-    for (var i = 0; i < photos.length; i++) {
-      total += Number(photos[i].pollution_impact) || 0;
-    }
-    pollutionEl.textContent = total > 0 ? total.toFixed(1) : '-';
-  }
-
   renderHistoryTypeChart(photos);
   renderHistoryTrendChart(photos);
 }
@@ -44,6 +33,10 @@ function renderHistoryTypeChart(photos) {
   if (!canvas) return;
 
   var categories = {};
+  var iconMap = {
+    plastic: '\u{1F9F4}', paper: '\u{1F4C4}', glass: '\u{1FAD9}',
+    metal: '\u{1F96B}', organic: '\u{1F342}', cigarette: '\u{1F6AC}', other: '\u{1F5D1}'
+  };
   var labelMap = {
     plastic: '플라스틱', paper: '종이', glass: '유리',
     metal: '금속', organic: '음식물', cigarette: '담배꽁초', other: '기타'
@@ -60,7 +53,7 @@ function renderHistoryTypeChart(photos) {
 
   var labels = [], data = [], colors = [];
   for (var key in categories) {
-    labels.push(labelMap[key] || key);
+    labels.push((iconMap[key] || '') + ' ' + (labelMap[key] || key));
     data.push(categories[key]);
     colors.push(colorMap[key] || '#8A8A8A');
   }

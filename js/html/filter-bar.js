@@ -1,13 +1,11 @@
 'use strict';
 
 var _FILTER_OPTIONS = [
+  { key: '1d', label: '1일' },
   { key: '1w', label: '1주' },
   { key: '1m', label: '1달' },
   { key: '3m', label: '3달' },
-  { key: '6m', label: '6달' },
-  { key: '1y', label: '1년' },
-  { key: '3y', label: '3년' },
-  { key: '5y', label: '5년' }
+  { key: '6m', label: '6달' }
 ];
 
 var _HTML_FILTER_BAR = (function() {

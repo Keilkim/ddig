@@ -110,13 +110,11 @@ async function loadPhotosByPeriod(periodKey) {
   var from = new Date();
 
   switch (periodKey) {
+    case '1d': from.setDate(now.getDate() - 1); break;
     case '1w': from.setDate(now.getDate() - 7); break;
     case '1m': from.setMonth(now.getMonth() - 1); break;
     case '3m': from.setMonth(now.getMonth() - 3); break;
     case '6m': from.setMonth(now.getMonth() - 6); break;
-    case '1y': from.setFullYear(now.getFullYear() - 1); break;
-    case '3y': from.setFullYear(now.getFullYear() - 3); break;
-    case '5y': from.setFullYear(now.getFullYear() - 5); break;
     default: from.setMonth(now.getMonth() - 1);
   }
 

@@ -233,7 +233,10 @@ function closeDetectionModal() {
   var modal = document.getElementById('detection-modal');
   if (modal) {
     modal.classList.remove('show');
-    setTimeout(function() { modal.remove(); }, 300);
+    setTimeout(function() {
+      modal.remove();
+      ensureCameraPlaying();
+    }, 300);
   }
   _pendingCapture = null;
 }

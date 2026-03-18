@@ -29,6 +29,9 @@ async function loadDashboard(date) {
 
   // 히스토리 필터 로드
   await loadFilteredHistory(AppState.filterPeriod);
+
+  // 내 수집 목록 로드
+  renderCollectionGrid(AppState.photos || []);
 }
 
 /* ─── 일일 통계 렌더링 ─── */
@@ -61,6 +64,17 @@ function renderDayStats(photos) {
   renderRouteMap(photos);
 }
 
+/* ─── 카테고리 아이콘 맵 ─── */
+var _CATEGORY_ICONS = {
+  plastic: '\u{1F9F4}',
+  paper: '\u{1F4C4}',
+  glass: '\u{1FAD9}',
+  metal: '\u{1F96B}',
+  organic: '\u{1F342}',
+  cigarette: '\u{1F6AC}',
+  other: '\u{1F5D1}'
+};
+
 /* ─── 쓰레기 유형 도넛 차트 ─── */
 function renderTrashTypeChart(photos) {
   var canvas = document.getElementById('chart-trash-type');
@@ -72,6 +86,7 @@ function renderTrashTypeChart(photos) {
     categories[cat] = (categories[cat] || 0) + 1;
   }
 
+  var keys = [];
   var labels = [];
   var data = [];
   var colors = [];
@@ -85,7 +100,8 @@ function renderTrashTypeChart(photos) {
   };
 
   for (var key in categories) {
-    labels.push(labelMap[key] || key);
+    keys.push(key);
+    labels.push((_CATEGORY_ICONS[key] || '') + ' ' + (labelMap[key] || key));
     data.push(categories[key]);
     colors.push(colorMap[key] || '#8A8A8A');
   }
@@ -107,7 +123,15 @@ function renderTrashTypeChart(photos) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'bottom', labels: { font: { size: 10 } } }
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: { size: 11 },
+            padding: 10,
+            usePointStyle: true,
+            pointStyle: 'circle'
+          }
+        }
       }
     }
   });
@@ -183,6 +207,35 @@ function haversine(a, b) {
     Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) *
     Math.sin(dLng / 2) * Math.sin(dLng / 2);
   return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
+}
+
+/* ─── 내 수집 목록 렌더링 ─── */
+function renderCollectionGrid(photos) {
+  var grid = document.getElementById('collection-grid');
+  if (!grid) return;
+
+  if (!photos || photos.length === 0) {
+    grid.innerHTML = '<div class="collection-empty">아직 수집한 쓰레기가 없습니다</div>';
+    return;
+  }
+
+  var labelMap = {
+    plastic: '플라스틱', paper: '종이', glass: '유리',
+    metal: '금속', organic: '음식물', cigarette: '담배꽁초', other: '기타'
+  };
+
+  var html = '';
+  for (var i = 0; i < photos.length; i++) {
+    var p = photos[i];
+    var url = getPhotoUrl(p.storage_path);
+    var label = labelMap[p.trash_category] || '';
+    html +=
+      '<div class="collection-card">' +
+        '<img src="' + url + '" alt="" loading="lazy">' +
+        (label ? '<div class="collection-card-label">' + label + '</div>' : '') +
+      '</div>';
+  }
+  grid.innerHTML = html;
 }
 
 /* ─── 날짜 포맷 ─── */

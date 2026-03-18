@@ -65,7 +65,7 @@ function goToDashboard() {
 
 function goToHome() {
   showView('plogging');
-  if (!AppState.cameraStream) initCamera();
+  ensureCameraPlaying();
 }
 
 function openCalendar() {

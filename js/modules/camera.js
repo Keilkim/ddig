@@ -19,10 +19,38 @@ async function initCamera() {
     var video = document.getElementById('camera-feed');
     if (video) {
       video.srcObject = stream;
+      video.play().catch(function() {});
       AppState.cameraStream = stream;
     }
   } catch (err) {
     console.error('카메라 초기화 실패:', err);
+  }
+}
+
+/* ─── 카메라 재생 보장 (모달/뷰 전환 후 복구) ─── */
+function ensureCameraPlaying() {
+  var video = document.getElementById('camera-feed');
+  if (!video) return;
+
+  if (AppState.cameraStream) {
+    // 스트림 트랙이 살아있는지 확인
+    var tracks = AppState.cameraStream.getVideoTracks();
+    if (tracks.length === 0 || tracks[0].readyState === 'ended') {
+      // 트랙이 죽었으면 재초기화
+      AppState.cameraStream = null;
+      initCamera();
+      return;
+    }
+    // srcObject 재설정
+    if (!video.srcObject || video.srcObject !== AppState.cameraStream) {
+      video.srcObject = AppState.cameraStream;
+    }
+    // 재생
+    if (video.paused || video.ended) {
+      video.play().catch(function() {});
+    }
+  } else {
+    initCamera();
   }
 }
 
