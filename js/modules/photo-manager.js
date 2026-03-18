@@ -143,37 +143,69 @@ function showConfirmModal(blob, analysis) {
     '</div>';
 
   document.body.appendChild(modal);
+  setTimeout(function() { modal.classList.add('show'); }, 10);
 
-  // 바운딩박스 렌더링
+  // 바운딩박스 렌더링 — 모달 표시 + 이미지 로드 후
   if (analysis && analysis.objects && analysis.objects.length > 0) {
     var img = document.getElementById('detection-img');
     if (img) {
-      img.onload = function() {
-        renderBoundingBoxes(analysis.objects);
+      var doBboxRender = function() {
+        // 모달 애니메이션 후 실제 크기가 잡힌 뒤 렌더링
+        setTimeout(function() {
+          renderBoundingBoxes(analysis.objects);
+        }, 400);
       };
-      if (img.complete) renderBoundingBoxes(analysis.objects);
+      if (img.complete) {
+        doBboxRender();
+      } else {
+        img.onload = doBboxRender;
+      }
     }
   }
-
-  setTimeout(function() { modal.classList.add('show'); }, 10);
 }
 
-/* ─── 바운딩박스 렌더링 ─── */
+/* ─── 바운딩박스 렌더링 (이미지 contain 영역에 맞춤) ─── */
 function renderBoundingBoxes(objects) {
   var container = document.getElementById('detection-bbox-container');
-  if (!container) return;
+  var img = document.getElementById('detection-img');
+  if (!container || !img) return;
   container.innerHTML = '';
+
+  // 이미지 실제 표시 영역 계산 (object-fit: contain)
+  var wrap = img.parentElement;
+  var wrapW = wrap.offsetWidth;
+  var wrapH = wrap.offsetHeight;
+  var natW = img.naturalWidth || 1;
+  var natH = img.naturalHeight || 1;
+
+  var scale = Math.min(wrapW / natW, wrapH / natH);
+  var dispW = natW * scale;
+  var dispH = natH * scale;
+  var offsetX = (wrapW - dispW) / 2;
+  var offsetY = (wrapH - dispH) / 2;
+
+  // bbox 컨테이너를 이미지 표시 영역에 정확히 맞춤
+  container.style.left = offsetX + 'px';
+  container.style.top = offsetY + 'px';
+  container.style.width = dispW + 'px';
+  container.style.height = dispH + 'px';
 
   for (var i = 0; i < objects.length; i++) {
     var obj = objects[i];
     if (!obj.bbox || obj.bbox.length < 4) continue;
 
+    // bbox: [x_min, y_min, x_max, y_max] (0~1000 정규화)
+    var x1 = obj.bbox[0] / 1000;
+    var y1 = obj.bbox[1] / 1000;
+    var x2 = obj.bbox[2] / 1000;
+    var y2 = obj.bbox[3] / 1000;
+
     var box = document.createElement('div');
     box.className = 'detection-bbox';
-    box.style.left = (obj.bbox[0] / 10) + '%';
-    box.style.top = (obj.bbox[1] / 10) + '%';
-    box.style.width = ((obj.bbox[2] - obj.bbox[0]) / 10) + '%';
-    box.style.height = ((obj.bbox[3] - obj.bbox[1]) / 10) + '%';
+    box.style.left = (x1 * 100) + '%';
+    box.style.top = (y1 * 100) + '%';
+    box.style.width = ((x2 - x1) * 100) + '%';
+    box.style.height = ((y2 - y1) * 100) + '%';
 
     var conf = Math.round((obj.confidence || 0) * 100);
     var label = document.createElement('span');

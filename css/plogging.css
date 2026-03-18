@@ -215,21 +215,21 @@
   border-radius: 14px;
   overflow: hidden;
   margin-bottom: 12px;
-  background: #f0f0f0;
-  max-height: 35vh;
+  background: #111;
 }
 
 .detection-modal-img {
   width: 100%;
   display: block;
   border-radius: 14px;
-  max-height: 35vh;
-  object-fit: cover;
+  max-height: 40vh;
+  object-fit: contain;
 }
 
 .detection-bbox-container {
   position: absolute;
-  inset: 0;
+  pointer-events: none;
+  /* JS가 이미지 실제 표시 영역에 맞게 위치/크기 설정 */
 }
 
 .detection-bbox {
