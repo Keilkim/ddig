@@ -1,13 +1,13 @@
 /* ========================================
-   팝업/모달 Styles — 둥글둥글 플로깅
+   팝업/모달 — 컴팩트, 이모지 없음
    ======================================== */
 
 /* 권한 팝업 */
 .permission-popup-box {
   text-align: center;
-  padding: var(--space-2xl) var(--space-xl);
+  padding: var(--space-xl);
   border-radius: var(--radius-xl);
-  max-width: 340px;
+  max-width: 320px;
 }
 
 .permission-title {
@@ -20,7 +20,7 @@
 
 .permission-subtitle {
   font-family: var(--font-display);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   color: var(--color-leaf);
   letter-spacing: 0.2em;
   margin-bottom: var(--space-lg);
@@ -29,8 +29,8 @@
 .permission-message {
   font-size: var(--font-size-sm);
   color: var(--color-charcoal);
-  line-height: 1.8;
-  margin-bottom: var(--space-xl);
+  line-height: 1.7;
+  margin-bottom: var(--space-lg);
 }
 
 .permission-buttons {
@@ -41,7 +41,7 @@
 .btn-reject,
 .btn-approve {
   flex: 1;
-  padding: var(--space-md);
+  padding: 10px;
   border-radius: var(--radius-pill);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
@@ -54,17 +54,13 @@
 
 .btn-approve {
   background: linear-gradient(135deg, var(--color-leaf), var(--color-mint));
-  color: var(--color-white);
-  box-shadow: 0 4px 15px rgba(107, 175, 123, 0.3);
-}
-
-.btn-approve:active {
-  box-shadow: 0 2px 8px rgba(107, 175, 123, 0.2);
+  color: #fff;
+  box-shadow: 0 3px 12px rgba(107, 175, 123, 0.25);
 }
 
 /* 캘린더 팝업 */
 .calendar-popup-box {
-  width: 340px;
+  width: 320px;
   max-width: 90vw;
   padding: var(--space-lg);
   border-radius: var(--radius-xl);
@@ -84,19 +80,15 @@
 }
 
 .cal-nav-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-circle);
   background: var(--color-mint-bg);
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-leaf);
-}
-
-.cal-nav-btn:active {
-  background: var(--color-mint-light);
 }
 
 .calendar-weekdays {
@@ -111,7 +103,7 @@
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
+  gap: 2px;
 }
 
 .cal-day {
@@ -121,7 +113,7 @@
   align-items: center;
   justify-content: center;
   font-size: var(--font-size-sm);
-  border-radius: 14px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all var(--transition-fast);
   position: relative;
@@ -131,15 +123,13 @@
 .cal-day.today { font-weight: var(--font-weight-bold); color: var(--color-mint); }
 .cal-day.has-activity {
   background: linear-gradient(135deg, var(--color-mint-light), var(--color-leaf));
-  color: var(--color-white);
-  border-radius: 14px;
+  color: #fff;
   font-weight: 600;
 }
-.cal-day.has-activity:hover { opacity: 0.85; }
 .cal-day.other-month { color: var(--color-titanium-light); }
 
 .cal-day-count {
-  font-size: 8px;
+  font-size: 7px;
   line-height: 1;
   margin-top: 1px;
 }
@@ -154,14 +144,14 @@
 }
 
 .legend-item { display: flex; align-items: center; gap: var(--space-xs); }
-.legend-dot { width: 8px; height: 8px; border-radius: var(--radius-circle); }
+.legend-dot { width: 7px; height: 7px; border-radius: var(--radius-circle); }
 .active-dot { background: var(--color-leaf); }
 
 .cal-close-btn {
   display: block;
   width: 100%;
   margin-top: var(--space-md);
-  padding: var(--space-sm) var(--space-md);
+  padding: 8px;
   background: var(--color-mint-bg);
   border-radius: var(--radius-pill);
   font-size: var(--font-size-sm);
@@ -171,7 +161,7 @@
 
 /* AI 분석 팝업 */
 .ai-popup-box {
-  width: 360px;
+  width: 340px;
   max-width: 90vw;
   max-height: 80vh;
   overflow-y: auto;
@@ -198,7 +188,7 @@
 
 .ai-result {
   font-size: var(--font-size-sm);
-  line-height: 1.8;
+  line-height: 1.7;
   color: var(--color-charcoal);
 }
 
@@ -215,7 +205,7 @@
   display: block;
   width: 100%;
   margin-top: var(--space-lg);
-  padding: var(--space-sm);
+  padding: 8px;
   background: var(--color-mint-bg);
   border-radius: var(--radius-pill);
   font-size: var(--font-size-sm);

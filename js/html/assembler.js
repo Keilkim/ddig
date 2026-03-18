@@ -2,14 +2,15 @@
 
 /* ════════════════════════════════════════
    HTML 조립 (Hierhear 패턴)
+   한 화면에 모든 것이 들어오도록 설계
    ════════════════════════════════════════ */
 (function() {
   var html =
-    /* 플로깅 뷰 */
+    /* 플로깅 뷰 — 100vh 고정 */
     '<div id="view-plogging" class="view-container active">' +
       _HTML_TITLE_BAR +
-      _HTML_GALLERY +
       _HTML_CAMERA_VIEW +
+      _HTML_GALLERY +
       _HTML_BUTTON_GROUP +
     '</div>' +
 

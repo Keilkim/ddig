@@ -1,41 +1,44 @@
 /* ========================================
-   플로깅-view Styles
+   플로깅-view — 100vh 한 화면 고정
    ======================================== */
 
 #view-plogging {
-  background: var(--color-ink);
+  background: #000;
   color: var(--color-white);
 }
 
-/* 타이틀 바 */
+/* 타이틀 바 — 최소 높이 */
 .title-bar {
-  padding: var(--space-md) var(--space-lg);
+  padding: 8px var(--space-md);
   text-align: center;
-  background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 100%);
+  background: rgba(0,0,0,0.6);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   z-index: 10;
+  flex-shrink: 0;
 }
 
 .title-bar-text {
   font-family: var(--font-display);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
   color: var(--color-white);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
 }
 
 .title-bar-x {
   font-weight: var(--font-weight-light);
   color: var(--color-mint);
+  margin: 0 2px;
 }
 
-/* 카메라 컨테이너 */
+/* 카메라 — flex:1로 남은 공간 채움 */
 .camera-container {
   flex: 1;
   position: relative;
   overflow: hidden;
   background: #000;
+  min-height: 0;
 }
 
 #camera-feed {
@@ -52,32 +55,29 @@
   pointer-events: none;
   transition: opacity 100ms;
 }
+.capture-flash.flash { opacity: 0.8; }
 
-.capture-flash.flash {
-  opacity: 0.8;
-}
-
-/* 버튼 그룹 */
+/* 버튼 그룹 — 컴팩트 */
 .btn-group {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: var(--space-md) var(--space-lg);
-  padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%);
+  padding: 8px var(--space-md);
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  background: rgba(0,0,0,0.6);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  flex-shrink: 0;
 }
 
 .btn-group-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 2px;
   background: none;
   color: var(--color-white);
-  padding: var(--space-sm);
-  min-width: 60px;
+  padding: 6px 12px;
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
 }
@@ -86,48 +86,49 @@
   background: rgba(255,255,255,0.1);
 }
 
-.btn-icon { font-size: 24px; }
-.btn-label { font-size: var(--font-size-xs); opacity: 0.8; }
+.btn-label {
+  font-size: var(--font-size-xs);
+  opacity: 0.85;
+  letter-spacing: 0.04em;
+}
 
-/* 촬영 버튼 (중앙 원형) — 귀여운 그린 링 */
+/* 촬영 버튼 */
 .btn-capture {
-  width: 72px;
-  height: 72px;
+  width: 56px;
+  height: 56px;
   border-radius: var(--radius-circle);
   background: var(--color-white);
   position: relative;
   padding: 0;
-  box-shadow: 0 0 0 4px rgba(107, 175, 123, 0.4);
-  transition: all var(--transition-normal);
+  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.4);
 }
 
 .btn-capture:active {
-  box-shadow: 0 0 0 8px rgba(107, 175, 123, 0.3);
+  box-shadow: 0 0 0 6px rgba(78, 205, 196, 0.3);
   transform: scale(0.92);
 }
 
 .btn-capture-ring {
   display: block;
-  width: 60px;
-  height: 60px;
+  width: 46px;
+  height: 46px;
   border-radius: var(--radius-circle);
-  border: 3px solid var(--color-accent-green);
+  border: 3px solid var(--color-mint);
   background: var(--color-white);
   transition: all var(--transition-fast);
 }
 
 .btn-capture:active .btn-capture-ring {
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
   background: var(--color-mint-light);
-  border-color: var(--color-accent-green);
 }
 
 /* ─── 분석 중 오버레이 ─── */
 .analyzing-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0,0,0,0.75);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -142,67 +143,56 @@
 }
 
 .analyzing-spinner {
-  width: 64px;
-  height: 64px;
-  border: 4px solid rgba(255,255,255,0.2);
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(255,255,255,0.2);
   border-top-color: var(--color-mint);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
-  margin: 0 auto 16px;
+  margin: 0 auto 14px;
 }
 
-.analyzing-icon {
-  font-size: 32px;
-  margin-bottom: 12px;
-  animation: bounce-soft 1s ease-in-out infinite;
-}
+.analyzing-icon { display: none; }
 
 .analyzing-text {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
-  margin-bottom: 4px;
 }
 
 .analyzing-sub {
-  font-size: 13px;
-  opacity: 0.7;
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 4px;
 }
 
-@keyframes bounce-soft {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-/* ─── 확인 모달 ─── */
+/* ─── 확인 모달 — 바텀시트 ─── */
 .detection-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0,0,0,0.5);
   z-index: 9998;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.25s;
 }
 
-.detection-modal.show {
-  opacity: 1;
-}
+.detection-modal.show { opacity: 1; }
 
 .detection-modal-card {
   background: #fff;
-  border-radius: 28px 28px 0 0;
+  border-radius: 24px 24px 0 0;
   width: 100%;
   max-width: 420px;
-  max-height: 90vh;
+  max-height: 80vh;
   overflow-y: auto;
-  padding: 24px 20px;
-  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  padding: 20px 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
   transform: translateY(100%);
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .detection-modal.show .detection-modal-card {
@@ -211,35 +201,34 @@
 
 .detection-modal-header {
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
-.detection-modal-emoji {
-  font-size: 36px;
-  display: block;
-  margin-bottom: 8px;
-}
+.detection-modal-emoji { display: none; }
 
 .detection-modal-title {
   font-family: var(--font-primary);
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--color-ink);
 }
 
-/* 이미지 + 바운딩박스 래퍼 */
+/* 이미지 + 바운딩박스 */
 .detection-modal-img-wrap {
   position: relative;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   background: #f0f0f0;
+  max-height: 35vh;
 }
 
 .detection-modal-img {
   width: 100%;
   display: block;
-  border-radius: 16px;
+  border-radius: 14px;
+  max-height: 35vh;
+  object-fit: cover;
 }
 
 .detection-bbox-container {
@@ -249,101 +238,97 @@
 
 .detection-bbox {
   position: absolute;
-  border: 2.5px solid #ff6b6b;
-  border-radius: 8px;
-  background: rgba(255, 107, 107, 0.12);
-  animation: bbox-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 2px solid var(--color-accent-red);
+  border-radius: 6px;
+  background: rgba(255, 107, 107, 0.1);
+  animation: bbox-pop 0.3s var(--transition-bounce);
 }
 
 .detection-bbox-label {
   position: absolute;
-  top: -24px;
+  top: -20px;
   left: -1px;
-  background: #ff6b6b;
+  background: var(--color-accent-red);
   color: #fff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 8px 8px 8px 0;
+  padding: 1px 6px;
+  border-radius: 6px 6px 6px 0;
   white-space: nowrap;
-  letter-spacing: 0.02em;
 }
 
 @keyframes bbox-pop {
-  0% { transform: scale(0.8); opacity: 0; }
+  0% { transform: scale(0.85); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
 
 /* 배지 */
 .detection-badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
+  top: 8px;
+  right: 8px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  backdrop-filter: blur(8px);
+  letter-spacing: 0.03em;
+  backdrop-filter: blur(6px);
 }
 
 .trash-badge {
-  background: rgba(255, 107, 107, 0.9);
+  background: rgba(255, 107, 107, 0.85);
   color: #fff;
 }
 
 .not-trash-badge {
-  background: rgba(107, 175, 123, 0.9);
+  background: rgba(107, 175, 123, 0.85);
   color: #fff;
 }
 
-/* 설명 텍스트 */
+/* 설명 */
 .detection-modal-desc {
-  font-size: 14px;
+  font-size: 13px;
   color: #555;
-  line-height: 1.6;
-  margin-bottom: 16px;
-  padding: 12px 16px;
-  background: var(--color-off-white);
-  border-radius: 12px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  background: #f8f8f6;
+  border-radius: 10px;
 }
 
-/* 오브젝트 리스트 */
+/* 오브젝트 리스트 — 컴팩트 */
 .detection-objects-list {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .detection-object-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid #f4f4f4;
 }
-
-.detection-object-item:last-child {
-  border-bottom: none;
-}
+.detection-object-item:last-child { border-bottom: none; }
 
 .detection-object-name {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--color-ink);
-  min-width: 70px;
+  min-width: 60px;
 }
 
 .detection-conf-bar {
   flex: 1;
-  height: 8px;
+  height: 6px;
   background: #f0f0f0;
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
 }
 
 .detection-conf-fill {
   height: 100%;
-  border-radius: 4px;
-  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 3px;
+  transition: width 0.5s var(--transition-bounce);
 }
 
 .conf-high { background: linear-gradient(90deg, #6baf7b, #4ecdc4); }
@@ -351,103 +336,87 @@
 .conf-low { background: linear-gradient(90deg, #ff6b6b, #ee5a24); }
 
 .detection-conf-num {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--color-titanium-dark);
-  min-width: 36px;
+  min-width: 32px;
   text-align: right;
 }
 
-/* 오염 영향도 */
+/* 오염 영향도 — 컴팩트 */
 .detection-impact {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
+  gap: 8px;
+  padding: 8px 12px;
   background: #fff5f5;
-  border-radius: 12px;
-  margin-bottom: 16px;
+  border-radius: 10px;
+  margin-bottom: 12px;
 }
 
 .detection-impact-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: #666;
-  min-width: 70px;
+  color: #888;
+  min-width: 60px;
 }
 
 .detection-impact-bar {
   flex: 1;
-  height: 10px;
+  height: 8px;
   background: #ffe0e0;
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
-.detection-impact-fill {
-  height: 100%;
-  border-radius: 5px;
-}
-
+.detection-impact-fill { height: 100%; border-radius: 4px; }
 .impact-high { background: linear-gradient(90deg, #ff6b6b, #c0392b); }
 .impact-mid { background: linear-gradient(90deg, #f0932b, #f9ca24); }
 .impact-low { background: linear-gradient(90deg, #6baf7b, #a8e6cf); }
 
 .detection-impact-num {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: #ff6b6b;
-  min-width: 36px;
+  min-width: 32px;
   text-align: right;
 }
 
 /* 액션 버튼 */
 .detection-modal-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 8px;
+  gap: 10px;
 }
 
 .detection-btn {
   flex: 1;
-  padding: 14px;
+  padding: 12px;
   border: none;
-  border-radius: 16px;
-  font-size: 15px;
+  border-radius: 14px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   transition: all var(--transition-normal);
 }
-
-.detection-btn:active {
-  transform: scale(0.96);
-}
+.detection-btn:active { transform: scale(0.96); }
 
 .detection-btn-cancel {
   background: #f0f0f0;
-  color: #666;
+  color: #888;
 }
 
 .detection-btn-save {
-  background: linear-gradient(135deg, #6baf7b, #4ecdc4);
+  background: linear-gradient(135deg, var(--color-leaf), var(--color-mint));
   color: #fff;
-  box-shadow: 0 4px 15px rgba(107, 175, 123, 0.3);
-}
-
-.detection-btn-save:active {
-  box-shadow: 0 2px 8px rgba(107, 175, 123, 0.2);
+  box-shadow: 0 3px 12px rgba(107, 175, 123, 0.25);
 }
 
 .detection-btn-close {
-  background: linear-gradient(135deg, #a8e6cf, #88d8b0);
+  background: linear-gradient(135deg, var(--color-mint-light), var(--color-leaf));
   color: #fff;
 }
 
-/* ─── 쓰레기 아님 카드 특수 스타일 ─── */
-.not-trash-card .detection-modal-header {
-  padding: 8px 0;
-}
-
+/* 쓰레기 아님 특수 */
 .not-trash-card .detection-modal-title {
-  color: var(--color-accent-green);
+  color: var(--color-leaf);
 }

@@ -141,21 +141,17 @@ function renderRouteMap(photos) {
 
   // 경로 선
   if (points.length > 1) {
-    L.polyline(points, { color: '#4A90D9', weight: 3, opacity: 0.7 }).addTo(_routeMap);
+    L.polyline(points, { color: '#4ecdc4', weight: 3, opacity: 0.7 }).addTo(_routeMap);
   }
 
   // 쓰레기 마커
   for (var j = 0; j < photos.length; j++) {
     if (photos[j].latitude && photos[j].longitude) {
-      var iconMap = {
-        plastic: '♻️', paper: '📄', glass: '🫙', metal: '🥫',
-        organic: '🍂', cigarette: '🚬', other: '🗑️'
-      };
-      var emoji = iconMap[photos[j].trash_category] || '📍';
       var icon = L.divIcon({
-        html: '<span style="font-size:18px">' + emoji + '</span>',
+        html: '<span style="display:block;width:10px;height:10px;background:#ff6b6b;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></span>',
         className: 'trash-marker',
-        iconSize: [24, 24]
+        iconSize: [10, 10],
+        iconAnchor: [5, 5]
       });
       L.marker([photos[j].latitude, photos[j].longitude], { icon: icon }).addTo(_routeMap);
     }

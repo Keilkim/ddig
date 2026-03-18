@@ -67,9 +67,8 @@ function showAnalyzingOverlay() {
   overlay.innerHTML =
     '<div class="analyzing-content">' +
       '<div class="analyzing-spinner"></div>' +
-      '<div class="analyzing-icon">🔍</div>' +
-      '<p class="analyzing-text">AI가 분석하고 있어요...</p>' +
-      '<p class="analyzing-sub">잠깐만 기다려주세요!</p>' +
+      '<p class="analyzing-text">AI 분석 중</p>' +
+      '<p class="analyzing-sub">잠시만 기다려주세요</p>' +
     '</div>';
   document.body.appendChild(overlay);
 }
@@ -93,12 +92,11 @@ function showNotTrashModal(blob, analysis) {
   modal.innerHTML =
     '<div class="detection-modal-card not-trash-card">' +
       '<div class="detection-modal-header">' +
-        '<span class="detection-modal-emoji">🌿</span>' +
-        '<h3 class="detection-modal-title">쓰레기가 아니에요!</h3>' +
+        '<h3 class="detection-modal-title">쓰레기가 아닙니다</h3>' +
       '</div>' +
       '<div class="detection-modal-img-wrap">' +
         '<img src="' + imgUrl + '" class="detection-modal-img" />' +
-        '<div class="detection-badge not-trash-badge">CLEAN ✨</div>' +
+        '<div class="detection-badge not-trash-badge">CLEAN</div>' +
       '</div>' +
       '<p class="detection-modal-desc">' + (analysis.description || '쓰레기가 감지되지 않았습니다') + '</p>' +
       buildObjectsList(analysis.objects, false) +
@@ -128,20 +126,19 @@ function showConfirmModal(blob, analysis) {
   modal.innerHTML =
     '<div class="detection-modal-card trash-card">' +
       '<div class="detection-modal-header">' +
-        '<span class="detection-modal-emoji">🗑️</span>' +
-        '<h3 class="detection-modal-title">쓰레기 발견!</h3>' +
+        '<h3 class="detection-modal-title">쓰레기 발견</h3>' +
       '</div>' +
       '<div class="detection-modal-img-wrap" id="detection-img-wrap">' +
         '<img src="' + imgUrl + '" class="detection-modal-img" id="detection-img" />' +
         '<div class="detection-bbox-container" id="detection-bbox-container"></div>' +
-        '<div class="detection-badge trash-badge">' + categoryEmoji + ' ' + categoryLabel + '</div>' +
+        '<div class="detection-badge trash-badge">' + categoryLabel + '</div>' +
       '</div>' +
       (analysis ? '<p class="detection-modal-desc">' + (analysis.description || '') + '</p>' : '') +
       buildObjectsList(analysis ? analysis.objects : [], true) +
       (analysis ? buildImpactBar(impact) : '') +
       '<div class="detection-modal-actions">' +
         '<button class="detection-btn detection-btn-cancel" onclick="cancelCapture()">취소</button>' +
-        '<button class="detection-btn detection-btn-save" onclick="confirmCapture()">저장하기 📸</button>' +
+        '<button class="detection-btn detection-btn-save" onclick="confirmCapture()">저장하기</button>' +
       '</div>' +
     '</div>';
 
@@ -293,7 +290,7 @@ async function confirmCapture() {
     console.error('저장 실패:', err);
     if (saveBtn) {
       saveBtn.disabled = false;
-      saveBtn.textContent = '다시 시도 📸';
+      saveBtn.textContent = '다시 시도';
     }
   }
 }
@@ -337,11 +334,10 @@ function renderGallery(photos) {
     var p = photos[i];
     var url = getPhotoUrl(p.storage_path);
     var label = p.trash_category || '';
-    var emoji = getCategoryEmoji(label);
     html +=
       '<div class="gallery-card">' +
         '<img src="' + url + '" alt="사진" loading="lazy">' +
-        (label ? '<div class="gallery-card-label">' + emoji + ' ' + getCategoryLabel(label) + '</div>' : '') +
+        (label ? '<div class="gallery-card-label">' + getCategoryLabel(label) + '</div>' : '') +
         '<button class="gallery-card-delete" onclick="onDeletePhoto(\'' + p.id + '\')">&times;</button>' +
       '</div>';
   }
