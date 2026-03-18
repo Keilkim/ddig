@@ -92,36 +92,32 @@
   letter-spacing: 0.04em;
 }
 
-/* 촬영 버튼 */
+/* 촬영 버튼 — 카메라 아이콘 */
 .btn-capture {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: var(--radius-circle);
-  background: var(--color-white);
+  background: rgba(26, 26, 26, 0.7);
   position: relative;
   padding: 0;
-  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(78, 205, 196, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all var(--transition-normal);
 }
 
 .btn-capture:active {
-  box-shadow: 0 0 0 6px rgba(78, 205, 196, 0.3);
-  transform: scale(0.92);
+  transform: scale(0.9);
+  border-color: var(--color-mint);
+  background: rgba(78, 205, 196, 0.2);
 }
 
-.btn-capture-ring {
-  display: block;
-  width: 46px;
-  height: 46px;
-  border-radius: var(--radius-circle);
-  border: 3px solid var(--color-mint);
-  background: var(--color-white);
-  transition: all var(--transition-fast);
-}
-
-.btn-capture:active .btn-capture-ring {
-  width: 40px;
-  height: 40px;
-  background: var(--color-mint-light);
+.btn-capture-icon {
+  width: 36px;
+  height: 36px;
 }
 
 /* ─── 분석 중 오버레이 ─── */
