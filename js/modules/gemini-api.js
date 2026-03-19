@@ -2,24 +2,57 @@
 
 /* ════════════════════════════════════════
    Gemini API 모듈 — 쓰레기 이미지 분석
+   환경부고시 제2022-254호 (2024.1.1 시행)
+   「분리배출 표시에 관한 지침」 기반 분류
    + 로컬 키워드 분류기로 카테고리 보정
    ════════════════════════════════════════ */
 
 var GEMINI_MODEL = 'gemini-2.0-flash';
+
+/*
+ * 분류 근거: 환경부고시 제2022-254호
+ * 「분리배출 표시에 관한 지침」 (2022.12.23 공포, 2024.1.1 시행)
+ *
+ * 공식 9개 카테고리:
+ *  1. paper      — 종이류
+ *  2. paperpack  — 종이팩 (일반팩/멸균팩)
+ *  3. glass      — 유리류
+ *  4. can        — 캔류 (철/알루미늄)
+ *  5. plastic    — 플라스틱류 (PET, HDPE, PP, PS 등 용기·트레이형)
+ *  6. vinyl      — 비닐류 (필름·시트형)
+ *  7. styrofoam  — 스티로폼 (발포합성수지)
+ *  8. cigarette  — 담배꽁초 (일반쓰레기)
+ *  9. other      — 기타 / 일반쓰레기
+ */
 
 /* ─── 키워드 기반 카테고리 분류 테이블 ─── */
 var _CLASSIFY_RULES = [
   {
     category: 'plastic',
     keywords: [
-      '페트', 'pet', '페트병', '플라스틱', 'plastic', '비닐', '비닐봉투', '비닐봉지',
-      '봉투', '포장재', '포장지', '랩', '용기', '플라스틱컵', '플컵', '빨대', 'straw',
-      '스티로폼', 'styrofoam', '택배봉투', '에어캡', '뽁뽁이', '일회용',
-      '일회용컵', '테이크아웃', '음료컵', '아이스컵', '물병', '생수병', '생수',
-      '음료수병', '음료병', '주스병', 'bottle', '요거트', '요구르트',
-      'pp', 'pe', 'ps', 'pvc', 'hdpe', 'ldpe', 'pet병',
-      '세제', '샴푸', '린스', '화장품', '튜브', '칫솔',
-      '젓가락', '수저', '포크', '나이프', '스푼'
+      '페트', 'pet', '페트병', '플라스틱', 'plastic', '용기', '트레이',
+      '플라스틱컵', '플컵', '빨대', 'straw', '일회용컵', '테이크아웃',
+      '음료컵', '아이스컵', '물병', '생수병', '생수', '음료수병', '음료병',
+      '주스병', 'bottle', '요거트', '요구르트', '플라스틱병',
+      'pp', 'pe', 'ps', 'pvc', 'hdpe', 'ldpe', 'pet병', 'other',
+      '세제통', '샴푸통', '린스통', '화장품용기', '튜브', '칫솔',
+      '젓가락', '수저', '포크', '나이프', '스푼', '일회용'
+    ]
+  },
+  {
+    category: 'vinyl',
+    keywords: [
+      '비닐', '비닐봉투', '비닐봉지', '봉투', '포장재', '포장지', '랩',
+      '택배봉투', '에어캡', '뽁뽁이', '필름', '시트', '지퍼백',
+      '과자봉지', '라면봉지', '식품포장', '쓰레기봉투',
+      'vinyl', 'film', 'wrap', 'bag', '봉지'
+    ]
+  },
+  {
+    category: 'styrofoam',
+    keywords: [
+      '스티로폼', 'styrofoam', '발포', '완충재', '아이스박스',
+      '포장스티로폼', '스치로폼', 'eps', '발포합성수지'
     ]
   },
   {
@@ -28,9 +61,15 @@ var _CLASSIFY_RULES = [
       '종이', 'paper', '박스', '상자', '택배', '택배박스', '골판지',
       '종이컵', '종이봉투', '신문', '신문지', '전단지', '전단', '광고지',
       '영수증', '영수', '카드보드', 'cardboard', '포장박스',
-      '잡지', '책', '노트', '서류', '문서', '편지', '봉투', '우편',
-      '화장지', '티슈', '냅킨', '키친타올', '휴지',
-      '우유팩', '주스팩', '종이팩', '종이가방', '쇼핑백'
+      '잡지', '책', '노트', '서류', '문서', '편지', '우편',
+      '화장지', '티슈', '냅킨', '키친타올', '휴지', '종이가방', '쇼핑백'
+    ]
+  },
+  {
+    category: 'paperpack',
+    keywords: [
+      '우유팩', '주스팩', '종이팩', '멸균팩', '살균팩', '일반팩',
+      '두유팩', '음료팩', 'tetra', '테트라팩', '팩'
     ]
   },
   {
@@ -38,27 +77,16 @@ var _CLASSIFY_RULES = [
     keywords: [
       '유리', 'glass', '유리병', '소주병', '맥주병', '와인병',
       '거울', '유리잔', '유리컵', '유리조각', '깨진유리',
-      '유리용기', '잼병', '소스병', '식초병'
+      '유리용기', '잼병', '소스병', '식초병', '음료수유리'
     ]
   },
   {
-    category: 'metal',
+    category: 'can',
     keywords: [
       '캔', 'can', '알루미늄', 'aluminum', '철', 'metal', '금속',
       '맥주캔', '음료캔', '콜라캔', '사이다캔', '에너지드링크',
-      '병뚜껑', '뚜껑', '철사', '못', '나사', '볼트',
-      '통조림', '참치캔', '스팸', '깡통', '호일', '알루미늄호일',
-      '철캔', '양철', '구리', '동전'
-    ]
-  },
-  {
-    category: 'organic',
-    keywords: [
-      '음식', 'food', '음식물', '과일', '껍질', '껍데기',
-      '바나나', '사과', '귤', '오렌지', '수박', '참외',
-      '채소', '야채', '밥', '빵', '면', '국',
-      '뼈', '생선', '고기', '달걀', '계란', '두부',
-      '나뭇잎', '나뭇가지', '풀', '꽃', '낙엽'
+      '병뚜껑', '뚜껑', '통조림', '참치캔', '스팸', '깡통',
+      '호일', '알루미늄호일', '철캔', '양철', '알미늄'
     ]
   },
   {
@@ -98,7 +126,6 @@ function classifyByKeywords(text) {
 
 /* ─── 분석 결과에서 모든 텍스트 추출하여 분류 ─── */
 function correctCategory(parsed) {
-  // 모든 텍스트를 합쳐서 키워드 매칭
   var allText = (parsed.description || '') + ' ' + (parsed.trash_category || '');
 
   if (Array.isArray(parsed.objects)) {
@@ -110,18 +137,23 @@ function correctCategory(parsed) {
   var detected = classifyByKeywords(allText);
   if (detected) return detected;
 
-  // Gemini가 영문 카테고리를 정상적으로 줬으면 그대로
-  var validCategories = ['plastic', 'paper', 'glass', 'metal', 'organic', 'cigarette'];
+  // Gemini 영문 카테고리 직접 매핑
+  var validCategories = ['plastic', 'vinyl', 'styrofoam', 'paper', 'paperpack', 'glass', 'can', 'cigarette'];
   var geminiCat = (parsed.trash_category || '').toLowerCase();
   if (validCategories.indexOf(geminiCat) !== -1) return geminiCat;
 
+  // Gemini가 옛 카테고리명(metal, organic)을 줬을 때 매핑
+  if (geminiCat === 'metal') return 'can';
+
   // 한글 카테고리명 매핑
   var koreanMap = {
-    '플라스틱': 'plastic', '비닐': 'plastic', '페트': 'plastic', '스티로폼': 'plastic',
+    '플라스틱': 'plastic', '페트': 'plastic',
+    '비닐': 'vinyl', '봉투': 'vinyl', '필름': 'vinyl',
+    '스티로폼': 'styrofoam', '발포': 'styrofoam',
     '종이': 'paper', '박스': 'paper', '골판지': 'paper',
+    '종이팩': 'paperpack', '우유팩': 'paperpack', '멸균팩': 'paperpack',
     '유리': 'glass',
-    '금속': 'metal', '캔': 'metal', '알루미늄': 'metal',
-    '음식물': 'organic', '유기물': 'organic',
+    '금속': 'can', '캔': 'can', '알루미늄': 'can', '철': 'can',
     '담배': 'cigarette', '꽁초': 'cigarette'
   };
 
@@ -143,29 +175,31 @@ async function analyzePhoto(base64Image) {
     GEMINI_MODEL + ':generateContent?key=' + GEMINI_API_KEY;
 
   var prompt =
-    'You are a trash classification AI. Analyze this image for litter/trash.\n\n' +
-    'IMPORTANT: You MUST classify trash_category as one of these exact English words:\n' +
-    '- "plastic" - PET bottles, plastic containers, vinyl bags, plastic wrap, cups, straws, styrofoam\n' +
-    '- "paper" - cardboard boxes, paper cups, newspapers, flyers, receipts, delivery boxes\n' +
-    '- "glass" - glass bottles, broken glass, mirrors\n' +
-    '- "metal" - aluminum cans, steel cans, metal pieces, bottle caps\n' +
-    '- "organic" - food waste, fruit peels, dead leaves\n' +
-    '- "cigarette" - cigarette butts, cigarette packs, lighters\n' +
-    '- "other" - ONLY if absolutely none of the above categories fit\n\n' +
+    'You are a trash/litter classification AI for a Korean plogging app.\n' +
+    'Classify based on Korea Ministry of Environment guidelines (환경부고시 제2022-254호).\n\n' +
+    'CATEGORIES (use exact English key):\n' +
+    '- "plastic" — PET bottles, plastic containers, trays, cups, straws, cutlery\n' +
+    '- "vinyl" — plastic bags, wrap, film, food packaging bags, bubble wrap\n' +
+    '- "styrofoam" — styrofoam, EPS, foam packaging\n' +
+    '- "paper" — cardboard boxes, newspapers, paper cups, receipts, flyers\n' +
+    '- "paperpack" — milk cartons, juice packs, tetra paks\n' +
+    '- "glass" — glass bottles (soju, beer, wine, sauce)\n' +
+    '- "can" — aluminum cans, steel cans, tin cans, bottle caps, foil\n' +
+    '- "cigarette" — cigarette butts, packs, lighters\n' +
+    '- "other" — only if none of the above fits\n\n' +
     'RULES:\n' +
-    '- PET bottle / water bottle / beverage bottle = "plastic" (NOT glass)\n' +
-    '- Vinyl bag / plastic bag = "plastic"\n' +
-    '- Delivery box / cardboard = "paper"\n' +
-    '- Styrofoam = "plastic"\n' +
-    '- DO NOT use "other" if any of the 6 categories above can apply\n\n' +
-    'BOUNDING BOX: For each detected object, provide bbox as [y_min, x_min, y_max, x_max]\n' +
-    'Each value is normalized 0-1000 (top-left is 0,0, bottom-right is 1000,1000)\n\n' +
-    'Respond ONLY with this JSON (no other text):\n' +
-    '{"is_trash":true,"trash_category":"plastic","pollution_impact":5,' +
+    '- PET bottle = "plastic" (NOT glass)\n' +
+    '- Plastic bag / vinyl bag = "vinyl" (NOT plastic)\n' +
+    '- Styrofoam = "styrofoam" (NOT plastic)\n' +
+    '- Metal can = "can"\n' +
+    '- Milk/juice carton = "paperpack"\n' +
+    '- DO NOT use "other" unless truly unclassifiable\n\n' +
+    'BOUNDING BOX: [y_min, x_min, y_max, x_max], values 0-1000\n\n' +
+    'Respond ONLY with JSON:\n' +
+    '{"is_trash":true,"trash_category":"plastic",' +
     '"description":"한국어 설명",' +
     '"objects":[{"label":"한국어 물체명","confidence":0.92,"bbox":[100,200,500,600]}]}\n\n' +
-    'If no trash: {"is_trash":false,"trash_category":"none","pollution_impact":0,' +
-    '"description":"한국어 설명","objects":[]}';
+    'No trash: {"is_trash":false,"trash_category":"none","description":"한국어 설명","objects":[]}';
 
   var body = {
     contents: [{
@@ -201,13 +235,12 @@ async function analyzePhoto(base64Image) {
     var text = result.candidates[0].content.parts[0].text;
     console.log('[Gemini 원본 응답]', text);
 
-    // JSON 추출
     var jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return null;
 
     var parsed = JSON.parse(jsonMatch[0]);
 
-    // bbox 형식 변환: Gemini [y_min, x_min, y_max, x_max] → 내부 [x_min, y_min, x_max, y_max]
+    // bbox 변환
     var objects = [];
     if (Array.isArray(parsed.objects)) {
       for (var i = 0; i < parsed.objects.length; i++) {
@@ -215,7 +248,6 @@ async function analyzePhoto(base64Image) {
         var bbox = obj.bbox;
         console.log('[Gemini bbox 원본]', obj.label, bbox);
         if (bbox && bbox.length >= 4) {
-          // 무의미한 좌표 필터링
           if (bbox[0] === 0 && bbox[1] === 0 && bbox[2] === 0 && bbox[3] === 0) continue;
           objects.push({
             label: obj.label || '물체',
@@ -233,14 +265,12 @@ async function analyzePhoto(base64Image) {
     }
     console.log('[변환된 objects]', JSON.stringify(objects));
 
-    // 로컬 키워드 분류기로 카테고리 보정
     var category = correctCategory(parsed);
     console.log('[카테고리 보정]', parsed.trash_category, '->', category);
 
     return {
       is_trash: parsed.is_trash !== false,
       trash_category: parsed.is_trash === false ? 'none' : category,
-      pollution_impact: parsed.is_trash === false ? 0 : (Number(parsed.pollution_impact) || 1),
       description: parsed.description || '',
       objects: objects
     };

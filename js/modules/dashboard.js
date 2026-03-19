@@ -64,15 +64,18 @@ function renderDayStats(photos) {
   renderRouteMap(photos);
 }
 
-/* ─── 카테고리 아이콘 맵 ─── */
-var _CATEGORY_ICONS = {
-  plastic: '\u{1F9F4}',
-  paper: '\u{1F4C4}',
-  glass: '\u{1FAD9}',
-  metal: '\u{1F96B}',
-  organic: '\u{1F342}',
-  cigarette: '\u{1F6AC}',
-  other: '\u{1F5D1}'
+/* ─── 환경부 분류 카테고리 공통 맵 ─── */
+var _CATEGORY_LABELS = {
+  plastic: '플라스틱', vinyl: '비닐류', styrofoam: '스티로폼',
+  paper: '종이류', paperpack: '종이팩', glass: '유리류',
+  can: '캔류', cigarette: '담배꽁초', other: '기타',
+  metal: '캔류', organic: '기타'
+};
+var _CATEGORY_COLORS = {
+  plastic: '#007AFF', vinyl: '#AF52DE', styrofoam: '#FF9500',
+  paper: '#D4956A', paperpack: '#34C759', glass: '#30B0C7',
+  can: '#8E8E93', cigarette: '#FF3B30', other: '#636366',
+  metal: '#8E8E93', organic: '#636366'
 };
 
 /* ─── 쓰레기 유형 도넛 차트 ─── */
@@ -90,20 +93,12 @@ function renderTrashTypeChart(photos) {
   var labels = [];
   var data = [];
   var colors = [];
-  var colorMap = {
-    plastic: '#4A90D9', paper: '#D4956A', glass: '#6BAF7B',
-    metal: '#C4C4C4', organic: '#8B6914', cigarette: '#D46B6B', other: '#8A8A8A'
-  };
-  var labelMap = {
-    plastic: '플라스틱', paper: '종이', glass: '유리',
-    metal: '금속', organic: '음식물', cigarette: '담배꽁초', other: '기타'
-  };
 
   for (var key in categories) {
     keys.push(key);
-    labels.push((_CATEGORY_ICONS[key] || '') + ' ' + (labelMap[key] || key));
+    labels.push(_CATEGORY_LABELS[key] || key);
     data.push(categories[key]);
-    colors.push(colorMap[key] || '#8A8A8A');
+    colors.push(_CATEGORY_COLORS[key] || '#636366');
   }
 
   if (_chartTrashType) _chartTrashType.destroy();
@@ -160,7 +155,14 @@ function renderRouteMap(photos) {
   }
 
   mapEl.innerHTML = '';
-  _routeMap = L.map(mapEl, { zoomControl: false, attributionControl: false });
+  _routeMap = L.map(mapEl, {
+    zoomControl: false,
+    attributionControl: false,
+    dragging: false,
+    touchZoom: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false
+  });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(_routeMap);
 
   // 경로 선
@@ -219,16 +221,11 @@ function renderCollectionGrid(photos) {
     return;
   }
 
-  var labelMap = {
-    plastic: '플라스틱', paper: '종이', glass: '유리',
-    metal: '금속', organic: '음식물', cigarette: '담배꽁초', other: '기타'
-  };
-
   var html = '';
   for (var i = 0; i < photos.length; i++) {
     var p = photos[i];
     var url = getPhotoUrl(p.storage_path);
-    var label = labelMap[p.trash_category] || '';
+    var label = _CATEGORY_LABELS[p.trash_category] || '';
     html +=
       '<div class="collection-card">' +
         '<img src="' + url + '" alt="" loading="lazy">' +

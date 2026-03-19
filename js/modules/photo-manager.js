@@ -129,16 +129,19 @@ function showConfirmModal(blob, analysis) {
   document.body.appendChild(modal);
   setTimeout(function() { modal.classList.add('show'); }, 10);
 
-  // 바운딩박스 렌더링
+  // 바운딩박스 렌더링 — 이미지 로드 완료 후 정확한 크기 측정
   if (analysis && analysis.objects && analysis.objects.length > 0) {
     var img = document.getElementById('detection-img');
     if (img) {
       var doBboxRender = function() {
-        setTimeout(function() {
-          renderBoundingBoxes(analysis.objects);
-        }, 400);
+        // requestAnimationFrame으로 레이아웃 완료 후 렌더링
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            renderBoundingBoxes(analysis.objects);
+          });
+        });
       };
-      if (img.complete) {
+      if (img.complete && img.naturalWidth > 0) {
         doBboxRender();
       } else {
         img.onload = doBboxRender;
@@ -227,11 +230,13 @@ function buildObjectsList(objects) {
   return html;
 }
 
-/* ─── 카테고리 라벨 (이모지 없음) ─── */
+/* ─── 카테고리 라벨 (환경부 분류 기준) ─── */
 function getCategoryLabel(cat) {
   var map = {
-    plastic: '플라스틱', paper: '종이', glass: '유리', metal: '금속',
-    organic: '유기물', cigarette: '담배꽁초', other: '기타', none: '없음'
+    plastic: '플라스틱', vinyl: '비닐류', styrofoam: '스티로폼',
+    paper: '종이류', paperpack: '종이팩', glass: '유리류',
+    can: '캔류', cigarette: '담배꽁초', other: '기타',
+    metal: '캔류', organic: '기타', none: '없음'
   };
   return map[cat] || '기타';
 }

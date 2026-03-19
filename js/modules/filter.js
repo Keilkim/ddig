@@ -33,19 +33,6 @@ function renderHistoryTypeChart(photos) {
   if (!canvas) return;
 
   var categories = {};
-  var iconMap = {
-    plastic: '\u{1F9F4}', paper: '\u{1F4C4}', glass: '\u{1FAD9}',
-    metal: '\u{1F96B}', organic: '\u{1F342}', cigarette: '\u{1F6AC}', other: '\u{1F5D1}'
-  };
-  var labelMap = {
-    plastic: '플라스틱', paper: '종이', glass: '유리',
-    metal: '금속', organic: '음식물', cigarette: '담배꽁초', other: '기타'
-  };
-  var colorMap = {
-    plastic: '#4A90D9', paper: '#D4956A', glass: '#6BAF7B',
-    metal: '#C4C4C4', organic: '#8B6914', cigarette: '#D46B6B', other: '#8A8A8A'
-  };
-
   for (var i = 0; i < photos.length; i++) {
     var cat = photos[i].trash_category || 'other';
     categories[cat] = (categories[cat] || 0) + 1;
@@ -53,9 +40,9 @@ function renderHistoryTypeChart(photos) {
 
   var labels = [], data = [], colors = [];
   for (var key in categories) {
-    labels.push((iconMap[key] || '') + ' ' + (labelMap[key] || key));
+    labels.push(_CATEGORY_LABELS[key] || key);
     data.push(categories[key]);
-    colors.push(colorMap[key] || '#8A8A8A');
+    colors.push(_CATEGORY_COLORS[key] || '#636366');
   }
 
   if (_chartHistoryType) _chartHistoryType.destroy();

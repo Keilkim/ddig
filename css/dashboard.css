@@ -22,9 +22,12 @@
 .dashboard-display {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: var(--space-md);
   -webkit-overflow-scrolling: touch;
   min-height: 0;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .dashboard-date-label {
@@ -66,6 +69,7 @@
   overflow: hidden;
   background: var(--color-white);
   box-shadow: var(--shadow-sm);
+  touch-action: none;
 }
 
 .distance-display {
