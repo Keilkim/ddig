@@ -22,5 +22,5 @@ var _HTML_DASHBOARD_DISPLAY = '' +
           '<canvas id="chart-trash-type"></canvas>' +
         '</div>' +
       '</div>' +
-    '</div>' +
-  '</div>';
+    '</div>';
+  /* 닫는 </div>는 history-view.js에서 닫음 — .dashboard-display 스크롤 영역에 히스토리/수집 포함 */
