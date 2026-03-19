@@ -213,7 +213,10 @@ async function analyzePhoto(base64Image) {
       for (var i = 0; i < parsed.objects.length; i++) {
         var obj = parsed.objects[i];
         var bbox = obj.bbox;
+        console.log('[Gemini bbox 원본]', obj.label, bbox);
         if (bbox && bbox.length >= 4) {
+          // 무의미한 좌표 필터링
+          if (bbox[0] === 0 && bbox[1] === 0 && bbox[2] === 0 && bbox[3] === 0) continue;
           objects.push({
             label: obj.label || '물체',
             confidence: Number(obj.confidence) || 0.5,
@@ -228,6 +231,7 @@ async function analyzePhoto(base64Image) {
         }
       }
     }
+    console.log('[변환된 objects]', JSON.stringify(objects));
 
     // 로컬 키워드 분류기로 카테고리 보정
     var category = correctCategory(parsed);

@@ -154,31 +154,39 @@ function renderBoundingBoxes(objects) {
   if (!container || !img) return;
   container.innerHTML = '';
 
-  var wrap = img.parentElement;
-  var wrapW = wrap.offsetWidth;
-  var wrapH = wrap.offsetHeight;
+  // getBoundingClientRect로 정확한 렌더링 크기 측정
+  var imgRect = img.getBoundingClientRect();
   var natW = img.naturalWidth || 1;
   var natH = img.naturalHeight || 1;
 
-  var scale = Math.min(wrapW / natW, wrapH / natH);
+  // object-fit: contain에서 실제 이미지 표시 영역
+  var scale = Math.min(imgRect.width / natW, imgRect.height / natH);
   var dispW = natW * scale;
   var dispH = natH * scale;
-  var offsetX = (wrapW - dispW) / 2;
-  var offsetY = (wrapH - dispH) / 2;
+  var offsetX = (imgRect.width - dispW) / 2;
+  var offsetY = (imgRect.height - dispH) / 2;
 
   container.style.left = offsetX + 'px';
   container.style.top = offsetY + 'px';
   container.style.width = dispW + 'px';
   container.style.height = dispH + 'px';
 
+  console.log('[bbox 렌더링] img:', imgRect.width, 'x', imgRect.height,
+    'disp:', dispW, 'x', dispH, 'offset:', offsetX, offsetY);
+
   for (var i = 0; i < objects.length; i++) {
     var obj = objects[i];
     if (!obj.bbox || obj.bbox.length < 4) continue;
 
+    // bbox 유효성 검사 — [0,0,0,0] 같은 무의미한 좌표 필터링
     var x1 = obj.bbox[0] / 1000;
     var y1 = obj.bbox[1] / 1000;
     var x2 = obj.bbox[2] / 1000;
     var y2 = obj.bbox[3] / 1000;
+
+    if (x2 - x1 < 0.01 || y2 - y1 < 0.01) continue;
+
+    console.log('[bbox]', obj.label, 'raw:', obj.bbox, '→ norm:', x1, y1, x2, y2);
 
     var box = document.createElement('div');
     box.className = 'detection-bbox';
