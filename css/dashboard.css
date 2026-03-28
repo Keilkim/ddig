@@ -69,7 +69,54 @@
   overflow: hidden;
   background: var(--color-white);
   box-shadow: var(--shadow-sm);
-  touch-action: none;
+  touch-action: manipulation;
+  position: relative;
+}
+
+/* ─── 줌 컨트롤 ─── */
+.route-map-zoom-ctrl {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: rgba(255,255,255,0.92);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  padding: 4px;
+}
+.zoom-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.zoom-btn:active {
+  background: rgba(0,0,0,0.08);
+}
+.zoom-level {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4ecdc4;
+  min-width: 34px;
+  text-align: center;
+  padding: 2px 0;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
 }
 
 .distance-display {
@@ -242,6 +289,89 @@
   padding: 24px;
   color: var(--color-tertiary);
   font-size: var(--font-size-sm);
+}
+
+/* 대쉬보드 상단 탭 */
+.dashboard-tabs {
+  display: flex;
+  flex-shrink: 0;
+  border-bottom: 0.5px solid var(--color-separator);
+  background: var(--color-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.dashboard-tab {
+  flex: 1;
+  padding: 10px 0;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-secondary);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dashboard-tab-active {
+  color: var(--color-green);
+  border-bottom-color: var(--color-green);
+}
+
+/* 랭킹 패널 */
+.ranking-display {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-md);
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+}
+
+.ranking-sub-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: var(--space-md);
+}
+
+.ranking-sub-tab {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+  color: var(--color-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ranking-sub-tab-active {
+  background: var(--color-green);
+  color: #fff;
+}
+
+.ranking-content {
+  min-height: 200px;
+}
+
+.ranking-empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--color-tertiary);
+  font-size: var(--font-size-sm);
+}
+
+/* 숨김 탭 패널 */
+.extra-display {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-md);
+  min-height: 0;
 }
 
 /* 대쉬보드 하단 탭바 */

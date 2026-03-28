@@ -27,7 +27,6 @@
   if (permGranted === 'granted') {
     AppState.permissionGranted = true;
     showView('plogging');
-    initCamera();
     refreshGallery();
   } else {
     showPopup('permission-popup');

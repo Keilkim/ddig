@@ -30,8 +30,10 @@ async function loadDashboard(date) {
   // 히스토리 필터 로드
   await loadFilteredHistory(AppState.filterPeriod);
 
-  // 내 수집 목록 로드
-  renderCollectionGrid(AppState.photos || []);
+  // 내 수집 목록 로드 (전체 사진)
+  var allPhotos = await loadUserPhotos();
+  AppState.photos = allPhotos;
+  renderCollectionGrid(allPhotos);
 }
 
 /* ─── 일일 통계 렌더링 ─── */
@@ -150,7 +152,31 @@ function renderRouteMap(photos) {
   }
 
   if (points.length === 0) {
-    mapEl.innerHTML = '<div class="chart-empty" style="height:100%;display:flex;align-items:center;justify-content:center">경로 데이터 없음</div>';
+    mapEl.innerHTML = '';
+    getCurrentLocation().then(function(loc) {
+      if (!loc.latitude || !loc.longitude) {
+        mapEl.innerHTML = '<div class="chart-empty" style="height:100%;display:flex;align-items:center;justify-content:center">위치를 가져올 수 없습니다</div>';
+        return;
+      }
+      if (_routeMap) { _routeMap.remove(); _routeMap = null; }
+      _routeMap = L.map(mapEl, {
+        zoomControl: false,
+        attributionControl: false,
+        dragging: true,
+        touchZoom: true,
+        scrollWheelZoom: false,
+        doubleClickZoom: false
+      });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(_routeMap);
+      _routeMap.setView([loc.latitude, loc.longitude], 15);
+      var icon = L.divIcon({
+        html: '<span style="display:block;width:14px;height:14px;background:#007AFF;border-radius:50%;border:3px solid #fff;box-shadow:0 0 8px rgba(0,122,255,0.5)"></span>',
+        className: 'current-loc-marker',
+        iconSize: [14, 14],
+        iconAnchor: [7, 7]
+      });
+      L.marker([loc.latitude, loc.longitude], { icon: icon }).addTo(_routeMap);
+    });
     return;
   }
 
@@ -158,12 +184,40 @@ function renderRouteMap(photos) {
   _routeMap = L.map(mapEl, {
     zoomControl: false,
     attributionControl: false,
-    dragging: false,
-    touchZoom: false,
-    scrollWheelZoom: false,
-    doubleClickZoom: false
+    dragging: true,
+    touchZoom: true,
+    scrollWheelZoom: true,
+    doubleClickZoom: true,
+    pinchZoom: true
   });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(_routeMap);
+
+  /* ─── 줌 컨트롤 UI (오른쪽) ─── */
+  var zoomWrap = document.createElement('div');
+  zoomWrap.className = 'route-map-zoom-ctrl';
+
+  var btnIn = document.createElement('button');
+  btnIn.className = 'zoom-btn';
+  btnIn.textContent = '+';
+  btnIn.addEventListener('click', function(e) { e.stopPropagation(); _routeMap.zoomIn(); });
+
+  var lvl = document.createElement('div');
+  lvl.className = 'zoom-level';
+  lvl.textContent = _routeMap.getZoom();
+
+  var btnOut = document.createElement('button');
+  btnOut.className = 'zoom-btn';
+  btnOut.textContent = '−';
+  btnOut.addEventListener('click', function(e) { e.stopPropagation(); _routeMap.zoomOut(); });
+
+  zoomWrap.appendChild(btnIn);
+  zoomWrap.appendChild(lvl);
+  zoomWrap.appendChild(btnOut);
+  mapEl.appendChild(zoomWrap);
+
+  _routeMap.on('zoomend', function() {
+    lvl.textContent = _routeMap.getZoom();
+  });
 
   // 경로 선
   if (points.length > 1) {

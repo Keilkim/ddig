@@ -8,8 +8,20 @@
 var _isCapturing = false;
 var _pendingCapture = null;
 
+var _CATEGORY_OPTIONS = [
+  { value: 'plastic', label: '플라스틱' },
+  { value: 'vinyl', label: '비닐류' },
+  { value: 'styrofoam', label: '스티로폼' },
+  { value: 'paper', label: '종이류' },
+  { value: 'paperpack', label: '종이팩' },
+  { value: 'glass', label: '유리류' },
+  { value: 'can', label: '캔류' },
+  { value: 'cigarette', label: '담배꽁초' },
+  { value: 'other', label: '기타' }
+];
+
 async function capturePhoto() {
-  if (_isCapturing) return;
+  if (_isCapturing || !AppState.cameraActive) return;
   _isCapturing = true;
 
   try {
@@ -119,6 +131,7 @@ function showConfirmModal(blob, analysis) {
         '<div class="detection-badge trash-badge">' + categoryLabel + '</div>' +
       '</div>' +
       (analysis ? '<p class="detection-modal-desc">' + (analysis.description || '') + '</p>' : '') +
+      (analysis ? buildCategorySelect(analysis.trash_category) : '') +
       buildObjectsList(analysis ? analysis.objects : []) +
       '<div class="detection-modal-actions">' +
         '<button class="detection-btn detection-btn-cancel" onclick="cancelCapture()">취소</button>' +
@@ -208,6 +221,30 @@ function renderBoundingBoxes(objects) {
   }
 }
 
+/* ─── 카테고리 선택 콤보박스 ─── */
+function buildCategorySelect(selectedCategory) {
+  var html = '<div class="detection-category-select-wrap">' +
+    '<label class="detection-category-label">분류 카테고리</label>' +
+    '<select id="detection-category-select" class="detection-category-select" onchange="onCategoryChange(this.value)">';
+  for (var i = 0; i < _CATEGORY_OPTIONS.length; i++) {
+    var opt = _CATEGORY_OPTIONS[i];
+    var sel = (opt.value === selectedCategory) ? ' selected' : '';
+    html += '<option value="' + opt.value + '"' + sel + '>' + opt.label + '</option>';
+  }
+  html += '</select></div>';
+  return html;
+}
+
+function onCategoryChange(newCategory) {
+  if (_pendingCapture && _pendingCapture.analysis) {
+    _pendingCapture.analysis.trash_category = newCategory;
+  }
+  var badge = document.querySelector('.detection-badge.trash-badge');
+  if (badge) {
+    badge.textContent = getCategoryLabel(newCategory);
+  }
+}
+
 /* ─── 오브젝트 리스트 ─── */
 function buildObjectsList(objects) {
   if (!objects || objects.length === 0) return '';
@@ -248,7 +285,7 @@ function closeDetectionModal() {
     modal.classList.remove('show');
     setTimeout(function() {
       modal.remove();
-      ensureCameraPlaying();
+      if (AppState.cameraActive) ensureCameraPlaying();
     }, 300);
   }
   _pendingCapture = null;

@@ -17,8 +17,10 @@
     /* 대쉬보드 뷰 */
     '<div id="view-dashboard" class="view-container">' +
       _HTML_TITLE_BAR +
+      _HTML_DASHBOARD_TABS +
       _HTML_DASHBOARD_DISPLAY +
       _HTML_HISTORY_VIEW +
+      _HTML_RANKING_VIEW +
       _HTML_BUTTON_GROUP_DASHBOARD +
     '</div>' +
 

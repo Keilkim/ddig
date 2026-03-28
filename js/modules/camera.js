@@ -10,8 +10,8 @@ async function initCamera() {
     var stream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: 'environment',
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
+        width: { ideal: 640 },
+        height: { ideal: 480 }
       },
       audio: false
     });
@@ -24,13 +24,14 @@ async function initCamera() {
     }
   } catch (err) {
     console.error('카메라 초기화 실패:', err);
+    throw err;
   }
 }
 
 /* ─── 카메라 재생 보장 (모달/뷰 전환 후 복구) ─── */
 function ensureCameraPlaying() {
   var video = document.getElementById('camera-feed');
-  if (!video) return;
+  if (!video || !AppState.cameraActive) return;
 
   if (AppState.cameraStream) {
     // 스트림 트랙이 살아있는지 확인
@@ -81,7 +82,19 @@ function captureFrame() {
     canvas.toBlob(function(blob) {
       if (blob) resolve(blob);
       else reject(new Error('캡처 실패'));
-    }, 'image/jpeg', 0.85);
+    }, 'image/jpeg', 0.6);
+  });
+}
+
+/* ─── 카메라 수동 시작 ─── */
+function startCameraManual() {
+  initCamera().then(function() {
+    var placeholder = document.getElementById('camera-placeholder');
+    if (placeholder) placeholder.classList.add('hidden');
+    AppState.cameraActive = true;
+  }).catch(function(err) {
+    console.error('카메라 시작 실패:', err);
+    alert('카메라를 시작할 수 없습니다.\n설정에서 카메라 권한을 허용해주세요.');
   });
 }
 

@@ -32,8 +32,9 @@ function closePopup(popupId) {
 /* ─── 권한 승인 ─── */
 async function approvePermission() {
   try {
-    // 카메라 권한
-    await navigator.mediaDevices.getUserMedia({ video: true });
+    // 카메라 권한 (확인 후 즉시 해제)
+    var permStream = await navigator.mediaDevices.getUserMedia({ video: true });
+    permStream.getTracks().forEach(function(t) { t.stop(); });
     // 위치 권한
     navigator.geolocation.getCurrentPosition(
       function() {},
@@ -45,7 +46,6 @@ async function approvePermission() {
     localStorage.setItem('digg_permission', 'granted');
     closePopup('permission-popup');
     showView('plogging');
-    initCamera();
   } catch (err) {
     alert('카메라 또는 위치 권한이 필요합니다.\n설정에서 권한을 허용해주세요.');
   }
@@ -65,7 +65,9 @@ function goToDashboard() {
 
 function goToHome() {
   showView('plogging');
-  ensureCameraPlaying();
+  if (AppState.cameraActive) {
+    ensureCameraPlaying();
+  }
 }
 
 function openCalendar() {

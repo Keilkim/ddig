@@ -1,7 +1,38 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(wc -l \"c:/Users/Razer18/Desktop/공심이/DIGG/js/modules/\"*.js \"c:/Users/Razer18/Desktop/공심이/DIGG/js/html/\"*.js \"c:/Users/Razer18/Desktop/공심이/DIGG/css/\"*.css)"
+  "allowedTools": {
+    "Read": [
+      "*"
+    ],
+    "Write": [
+      "*"
+    ],
+    "Edit": [
+      "*"
+    ],
+    "Glob": [
+      "*"
+    ],
+    "Grep": [
+      "*"
+    ],
+    "Agent": [
+      "*"
+    ],
+    "Bash": [
+      "*"
+    ],
+    "WebSearch": [
+      "*"
+    ],
+    "WebFetch": [
+      "*"
+    ],
+    "NotebookEdit": [
+      "*"
+    ],
+    "TodoWrite": [
+      "*"
     ]
-  }
+  },
+  "defaultMode": "bypassPermissions"
 }

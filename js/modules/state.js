@@ -11,6 +11,7 @@ var AppState = {
   selectedDate: null,
   filterPeriod: '1m',
   cameraStream: null,
+  cameraActive: false,
   photos: [],
   dashboardData: null
 };
