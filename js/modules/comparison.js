@@ -122,12 +122,17 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
     }).addTo(_comparisonMap);
   }
 
-  // 맵 범위 → 상대방 경로에만 맞춤
-  if (targetPoints.length > 0) {
-    _comparisonMap.fitBounds(targetPoints, { padding: [30, 30] });
-  } else {
-    _comparisonMap.setView([37.5665, 126.978], 11);
-  }
+  // 맵 크기 재계산 후 범위 맞춤 (팝업 렌더링 완료 대기)
+  setTimeout(function() {
+    if (!_comparisonMap) return;
+    _comparisonMap.invalidateSize();
+
+    if (targetPoints.length > 0) {
+      _comparisonMap.fitBounds(targetPoints, { padding: [30, 30] });
+    } else {
+      _comparisonMap.setView([37.5665, 126.978], 11);
+    }
+  }, 200);
 
   // 통계 렌더링
   renderComparisonStats(targetRoutes, targetDisplayName);
