@@ -127,6 +127,13 @@
   text-align: center;
 }
 
+/* 카메라 꺼졌을 때 촬영 버튼 & 컨트롤 바 & 가이드 숨기기 */
+.camera-container:has(.camera-placeholder:not(.hidden)) .btn-capture-float,
+.camera-container:has(.camera-placeholder:not(.hidden)) .camera-top-bar,
+.camera-container:has(.camera-placeholder:not(.hidden)) .camera-guide-overlay {
+  display: none;
+}
+
 .camera-stop-btn {
   color: var(--color-red);
 }
