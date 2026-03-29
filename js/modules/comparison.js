@@ -35,12 +35,14 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
   var targetRoutes = results[0];
   var targetDistrictStats = results[1];
 
-  // 포인트 추출
+  // 포인트 추출 (유효한 좌표만)
   var points = [];
   for (var i = 0; i < targetRoutes.length; i++) {
     var r = targetRoutes[i];
-    if (r.latitude && r.longitude) {
-      points.push([r.latitude, r.longitude]);
+    var lat = Number(r.latitude);
+    var lng = Number(r.longitude);
+    if (isFinite(lat) && isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      points.push([lat, lng]);
     }
   }
 
@@ -56,9 +58,14 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
   }
 
   // 맵 렌더링 — 컨테이너 크기 보장
-  mapEl.innerHTML = '';
   mapEl.style.minHeight = '300px';
-  if (_comparisonMap) { _comparisonMap.remove(); _comparisonMap = null; }
+  if (_comparisonMap) {
+    try { _comparisonMap.remove(); } catch(e) { /* 이미 제거됨 */ }
+    _comparisonMap = null;
+  }
+  // Leaflet 내부 참조 제거 후 컨테이너 초기화
+  delete mapEl._leaflet_id;
+  mapEl.innerHTML = '';
 
   // 팝업 렌더링 완료 대기 후 맵 생성
   await new Promise(function(r) { setTimeout(r, 100); });
@@ -129,11 +136,16 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
       '<span class="legend-item"><span class="legend-dot legend-dot-area" style="background:rgba(52,199,89,0.35)"></span>활동 지역</span>';
   }
 
-  // fitBounds — 여러번 시도하여 확실하게
+  // fitBounds — 유효한 좌표만 사용 + 안전하게 시도
+  var validBounds = L.latLngBounds(points.map(function(p) { return L.latLng(p[0], p[1]); }));
   var doBounds = function() {
     if (!_comparisonMap) return;
-    _comparisonMap.invalidateSize();
-    _comparisonMap.fitBounds(points, { padding: [30, 30] });
+    try {
+      _comparisonMap.invalidateSize();
+      if (validBounds.isValid()) {
+        _comparisonMap.fitBounds(validBounds, { padding: [30, 30] });
+      }
+    } catch(e) { /* 맵 컨테이너 크기 문제 무시 */ }
   };
   setTimeout(doBounds, 100);
   setTimeout(doBounds, 400);
@@ -178,5 +190,13 @@ function closeComparisonMap() {
   var popup = document.getElementById('comparison-popup');
   if (popup) popup.classList.remove('active');
 
-  if (_comparisonMap) { _comparisonMap.remove(); _comparisonMap = null; }
+  if (_comparisonMap) {
+    try { _comparisonMap.remove(); } catch(e) { /* 이미 제거됨 */ }
+    _comparisonMap = null;
+  }
+  var mapEl = document.getElementById('comparison-map');
+  if (mapEl) {
+    delete mapEl._leaflet_id;
+    mapEl.innerHTML = '';
+  }
 }
