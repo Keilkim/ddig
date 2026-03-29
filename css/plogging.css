@@ -47,6 +47,86 @@
   object-fit: cover;
 }
 
+/* 카메라 상단 컨트롤 바 */
+.camera-top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  background: linear-gradient(rgba(0,0,0,0.5), transparent);
+  z-index: 20;
+}
+
+.camera-ctrl-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.85);
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.camera-ctrl-btn:active {
+  background: rgba(255,255,255,0.12);
+}
+.camera-ctrl-btn-active {
+  color: #FFD60A;
+}
+.camera-ctrl-btn-active svg {
+  stroke: #FFD60A;
+}
+
+.camera-ctrl-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.camera-zoom-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0,0,0,0.35);
+  border-radius: var(--radius-pill);
+  padding: 4px 6px;
+}
+
+.camera-zoom-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.camera-zoom-btn:active {
+  background: rgba(255,255,255,0.3);
+}
+
+.camera-zoom-level {
+  font-size: 12px;
+  font-weight: 700;
+  color: #FFD60A;
+  min-width: 36px;
+  text-align: center;
+}
+
 /* 카메라 가이드 오버레이 */
 .camera-guide-overlay {
   position: absolute;
