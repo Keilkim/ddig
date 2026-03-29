@@ -6,6 +6,7 @@
 
 var _chartTrashType = null;
 var _routeMap = null;
+var _DARK_TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
 
 /* ─── Chart.js 다크 테마 기본값 ─── */
 if (typeof Chart !== 'undefined') {
@@ -174,7 +175,7 @@ function renderRouteMap(photos) {
         scrollWheelZoom: false,
         doubleClickZoom: false
       });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(_routeMap);
+      L.tileLayer(_DARK_TILE_URL, { maxZoom: 19 }).addTo(_routeMap);
       _routeMap.setView([loc.latitude, loc.longitude], 15);
       var icon = L.divIcon({
         html: '<span style="display:block;width:14px;height:14px;background:#007AFF;border-radius:50%;border:3px solid #fff;box-shadow:0 0 8px rgba(0,122,255,0.5)"></span>',
@@ -197,7 +198,7 @@ function renderRouteMap(photos) {
     doubleClickZoom: true,
     pinchZoom: true
   });
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(_routeMap);
+  L.tileLayer(_DARK_TILE_URL, { maxZoom: 19 }).addTo(_routeMap);
 
   /* ─── 줌 컨트롤 UI (오른쪽) ─── */
   var zoomWrap = document.createElement('div');
@@ -228,14 +229,14 @@ function renderRouteMap(photos) {
 
   // 경로 선
   if (points.length > 1) {
-    L.polyline(points, { color: '#4ecdc4', weight: 3, opacity: 0.7 }).addTo(_routeMap);
+    L.polyline(points, { color: '#34C759', weight: 3, opacity: 0.85 }).addTo(_routeMap);
   }
 
   // 쓰레기 마커
   for (var j = 0; j < photos.length; j++) {
     if (photos[j].latitude && photos[j].longitude) {
       var icon = L.divIcon({
-        html: '<span style="display:block;width:10px;height:10px;background:#ff6b6b;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></span>',
+        html: '<span style="display:block;width:10px;height:10px;background:#34C759;border-radius:50%;border:2px solid rgba(0,0,0,0.3);box-shadow:0 0 6px rgba(52,199,89,0.5)"></span>',
         className: 'trash-marker',
         iconSize: [10, 10],
         iconAnchor: [5, 5]

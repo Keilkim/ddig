@@ -342,11 +342,10 @@ function blobToBase64(blob) {
   });
 }
 
-/* ─── 갤러리 새로고침 ─── */
+/* ─── 갤러리 새로고침 (당일 사진만) ─── */
 async function refreshGallery() {
-  var photos = await loadUserPhotos();
-  AppState.photos = photos;
-  renderGallery(photos);
+  var todayPhotos = await loadPhotosByDate(new Date());
+  renderGallery(todayPhotos);
 }
 
 /* ─── 갤러리 렌더링 (클릭으로 삭제) ─── */

@@ -338,44 +338,42 @@
 
 .comparison-stats {
   flex-shrink: 0;
-  padding: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
   padding-bottom: env(safe-area-inset-bottom, var(--space-md));
 }
 
-.comparison-stat-grid {
-  display: grid;
-  grid-template-columns: auto 1fr 1fr;
-  gap: 6px 12px;
-  align-items: center;
+.comparison-stat-row {
+  display: flex;
+  gap: 8px;
 }
 
-.comparison-stat-header {
-  font-size: var(--font-size-xs);
-  font-weight: 700;
-  color: var(--color-secondary);
+.comparison-stat-card {
+  flex: 1;
+  background: #1C1C1E;
+  border-radius: var(--radius-md);
+  padding: 10px;
   text-align: center;
-  padding-bottom: 4px;
 }
 
-.comparison-stat-me {
-  color: #34C759;
-}
-
-.comparison-stat-other {
-  color: #007AFF;
-}
-
-.comparison-stat-label {
+.comparison-stat-card-label {
   font-size: var(--font-size-xs);
   color: var(--color-secondary);
   font-weight: 500;
+  margin-bottom: 4px;
 }
 
-.comparison-stat-value {
-  text-align: center;
-  font-size: var(--font-size-sm);
+.comparison-stat-card-value {
+  font-size: var(--font-size-lg);
   font-weight: 700;
+  color: #34C759;
   font-variant-numeric: tabular-nums;
+}
+
+.comparison-stat-unit {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-secondary);
+  margin-left: 2px;
 }
 
 /* 시군구 툴팁 */
