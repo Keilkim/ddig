@@ -35,18 +35,24 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
   var targetRoutes = results[0];
   var targetDistrictStats = results[1];
 
-  // 포인트 추출 (유효한 좌표만)
-  var points = [];
+  // 날짜별 그룹핑 (captured_at 기준)
+  var dayGroups = {};  // { 'YYYY-MM-DD': [[lat,lng], ...] }
+  var allPoints = [];
   for (var i = 0; i < targetRoutes.length; i++) {
     var r = targetRoutes[i];
     var lat = Number(r.latitude);
     var lng = Number(r.longitude);
     if (isFinite(lat) && isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-      points.push([lat, lng]);
+      var dayKey = r.captured_at ? r.captured_at.substring(0, 10) : 'unknown';
+      if (!dayGroups[dayKey]) dayGroups[dayKey] = [];
+      dayGroups[dayKey].push([lat, lng]);
+      allPoints.push([lat, lng]);
     }
   }
 
-  if (points.length === 0) {
+  var dayKeys = Object.keys(dayGroups).sort();
+
+  if (allPoints.length === 0) {
     mapEl.innerHTML =
       '<div class="ranking-empty">' +
         '<div style="font-size:40px;margin-bottom:12px">📍</div>' +
@@ -56,6 +62,12 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
     renderComparisonStats(0, 0);
     return;
   }
+
+  // 날짜별 색상 팔레트
+  var _dayColors = [
+    '#34C759','#FF9F0A','#0A84FF','#FF375F','#BF5AF2',
+    '#FFD60A','#64D2FF','#FF6482','#30D158','#AC8E68'
+  ];
 
   // 맵 렌더링 — 컨테이너 크기 보장
   mapEl.style.minHeight = '300px';
@@ -117,27 +129,43 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
     }).addTo(_comparisonMap);
   }
 
-  // 전체 경로 한번에 그리기
-  if (points.length > 1) {
-    L.polyline(points, { color: '#34C759', weight: 3, opacity: 0.85 }).addTo(_comparisonMap);
-  }
-  for (var k = 0; k < points.length; k++) {
-    L.circleMarker(points[k], {
-      radius: 4, fillColor: '#34C759', color: 'rgba(0,0,0,0.3)',
-      weight: 1.5, fillOpacity: 0.9
-    }).addTo(_comparisonMap);
+  // 경로 전용 pane (GeoJSON 위에 표시)
+  _comparisonMap.createPane('routePane');
+  _comparisonMap.getPane('routePane').style.zIndex = 450;
+  _comparisonMap.createPane('markerPane2');
+  _comparisonMap.getPane('markerPane2').style.zIndex = 460;
+
+  // 날짜별 경로 그리기
+  for (var di = 0; di < dayKeys.length; di++) {
+    var dayPts = dayGroups[dayKeys[di]];
+    var color = _dayColors[di % _dayColors.length];
+
+    // 경로선
+    if (dayPts.length > 1) {
+      L.polyline(dayPts, { color: color, weight: 4, opacity: 0.9, pane: 'routePane' }).addTo(_comparisonMap);
+    }
+    // 마커
+    for (var k = 0; k < dayPts.length; k++) {
+      L.circleMarker(dayPts[k], {
+        radius: 6, fillColor: color, color: '#fff',
+        weight: 2, fillOpacity: 1, pane: 'markerPane2'
+      }).addTo(_comparisonMap);
+    }
   }
 
-  // 레전드
+  // 레전드 — 날짜별 색상 표시
   var legendEl = popup.querySelector('.comparison-legend');
   if (legendEl) {
-    legendEl.innerHTML =
-      '<span class="legend-item"><span class="legend-dot" style="background:#34C759"></span>경로 (' + points.length + '곳)</span>' +
-      '<span class="legend-item"><span class="legend-dot legend-dot-area" style="background:rgba(52,199,89,0.35)"></span>활동 지역</span>';
+    var legendHtml = '';
+    for (var li = 0; li < dayKeys.length; li++) {
+      var cnt = dayGroups[dayKeys[li]].length;
+      legendHtml += '<span class="legend-item"><span class="legend-dot" style="background:' + _dayColors[li % _dayColors.length] + '"></span>' + cnt + '개</span>';
+    }
+    legendEl.innerHTML = legendHtml;
   }
 
   // fitBounds — 유효한 좌표만 사용 + 안전하게 시도
-  var validBounds = L.latLngBounds(points.map(function(p) { return L.latLng(p[0], p[1]); }));
+  var validBounds = L.latLngBounds(allPoints.map(function(p) { return L.latLng(p[0], p[1]); }));
   var doBounds = function() {
     if (!_comparisonMap) return;
     try {
@@ -151,13 +179,16 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
   setTimeout(doBounds, 400);
   setTimeout(doBounds, 800);
 
-  // 거리 계산
+  // 거리 계산 (날짜별로 분리하여 합산)
   var totalDist = 0;
-  for (var j = 1; j < points.length; j++) {
-    totalDist += haversine(
-      { lat: points[j - 1][0], lng: points[j - 1][1] },
-      { lat: points[j][0], lng: points[j][1] }
-    );
+  for (var di2 = 0; di2 < dayKeys.length; di2++) {
+    var dPts = dayGroups[dayKeys[di2]];
+    for (var j = 1; j < dPts.length; j++) {
+      totalDist += haversine(
+        { lat: dPts[j - 1][0], lng: dPts[j - 1][1] },
+        { lat: dPts[j][0], lng: dPts[j][1] }
+      );
+    }
   }
 
   renderComparisonStats(targetRoutes.length, totalDist);

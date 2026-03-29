@@ -310,13 +310,16 @@
 
 .comparison-legend {
   display: flex;
-  gap: var(--space-md);
+  flex-wrap: wrap;
+  gap: 6px var(--space-md);
   justify-content: center;
   padding: 8px var(--space-md);
   font-size: var(--font-size-xs);
   color: var(--color-secondary);
   flex-shrink: 0;
   border-top: 0.5px solid var(--color-separator);
+  max-height: 60px;
+  overflow-y: auto;
 }
 
 .comparison-legend .legend-item {
