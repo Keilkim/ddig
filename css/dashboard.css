@@ -366,6 +366,115 @@
   font-size: var(--font-size-sm);
 }
 
+/* 랭킹 스피너 */
+.ranking-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--color-separator);
+  border-top-color: var(--color-green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* 랭킹 리스트 */
+.ranking-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.ranking-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px var(--space-md);
+  border-bottom: 0.5px solid var(--color-separator);
+  cursor: pointer;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.ranking-item:active {
+  background: var(--color-fill);
+}
+.ranking-item-self {
+  background: rgba(52, 199, 89, 0.06);
+}
+
+.ranking-position {
+  width: 32px;
+  text-align: center;
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--color-secondary);
+  flex-shrink: 0;
+}
+
+.ranking-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--color-fill);
+}
+.ranking-avatar-default {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.ranking-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ranking-name {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-label);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ranking-me-badge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 6px;
+  background: var(--color-green);
+  color: #fff;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.ranking-district {
+  font-size: var(--font-size-xs);
+  color: var(--color-tertiary);
+  margin-top: 2px;
+}
+
+.ranking-score-col {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.ranking-score {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--color-green);
+  font-variant-numeric: tabular-nums;
+}
+
+.ranking-sub-score {
+  font-size: var(--font-size-xs);
+  color: var(--color-tertiary);
+  margin-top: 1px;
+}
+
 /* 숨김 탭 패널 */
 .extra-display {
   flex: 1;

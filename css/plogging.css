@@ -128,6 +128,41 @@
 }
 .capture-flash.flash { opacity: 0.9; }
 
+/* 촬영 버튼 — 카메라 위 플로팅 */
+.btn-capture-float {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid rgba(255,255,255,0.9);
+  transition: all 0.15s ease;
+  z-index: 15;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-capture-float::after {
+  content: '';
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #fff;
+  transition: all 0.15s ease;
+}
+.btn-capture-float:active {
+  transform: translateX(-50%) scale(0.92);
+}
+.btn-capture-float:active::after {
+  background: rgba(255,255,255,0.7);
+}
+
 /* 하단 컨트롤 바 */
 .btn-group {
   display: flex;

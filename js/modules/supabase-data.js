@@ -8,6 +8,13 @@
 async function savePhotoMeta(data) {
   if (!supabaseClient || !AppState.user) return null;
 
+  // 시군구 코드 결정
+  var districtCode = null;
+  if (data.latitude && data.longitude) {
+    var district = findDistrict(data.latitude, data.longitude);
+    if (district) districtCode = district.code;
+  }
+
   var result = await supabaseClient
     .from('photos')
     .insert({
@@ -18,7 +25,8 @@ async function savePhotoMeta(data) {
       longitude: data.longitude,
       trash_category: data.trashCategory || null,
       pollution_impact: data.pollutionImpact || null,
-      gemini_raw: data.geminiRaw || null
+      gemini_raw: data.geminiRaw || null,
+      district_code: districtCode
     })
     .select()
     .single();
@@ -126,6 +134,68 @@ async function loadPhotosByPeriod(periodKey) {
     .order('captured_at', { ascending: true });
 
   return result.data || [];
+}
+
+/* ─── 랭킹 데이터 조회 (RPC) ─── */
+async function loadRankingData(scope) {
+  if (!supabaseClient) return [];
+
+  var result = await supabaseClient.rpc('get_ranking', { rank_scope: scope || 'national' });
+  if (result.error) {
+    console.error('랭킹 로드 실패:', result.error);
+    return [];
+  }
+  return result.data || [];
+}
+
+/* ─── 특정 유저 경로 조회 (RPC) ─── */
+async function loadUserRoutes(userId) {
+  if (!supabaseClient) return [];
+
+  var result = await supabaseClient.rpc('get_user_routes', { target_user_id: userId });
+  if (result.error) {
+    console.error('경로 로드 실패:', result.error);
+    return [];
+  }
+  return result.data || [];
+}
+
+/* ─── 특정 유저 시군구별 통계 (RPC) ─── */
+async function loadUserDistrictStats(userId) {
+  if (!supabaseClient) return [];
+
+  var result = await supabaseClient.rpc('get_user_district_stats', { target_user_id: userId });
+  if (result.error) {
+    console.error('시군구 통계 로드 실패:', result.error);
+    return [];
+  }
+  return result.data || [];
+}
+
+/* ─── 기존 사진 district_code 백필 (1회) ─── */
+async function backfillDistrictCodes() {
+  if (!supabaseClient || !AppState.user) return;
+  if (!_districtGeoJSON) return;
+
+  var result = await supabaseClient
+    .from('photos')
+    .select('id, latitude, longitude')
+    .eq('user_id', AppState.user.id)
+    .is('district_code', null)
+    .not('latitude', 'is', null);
+
+  if (!result.data || result.data.length === 0) return;
+
+  for (var i = 0; i < result.data.length; i++) {
+    var photo = result.data[i];
+    var district = findDistrict(photo.latitude, photo.longitude);
+    if (district) {
+      await supabaseClient
+        .from('photos')
+        .update({ district_code: district.code })
+        .eq('id', photo.id);
+    }
+  }
 }
 
 /* ─── 월별 활동 요약 (캘린더용) ─── */

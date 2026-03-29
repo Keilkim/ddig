@@ -27,7 +27,8 @@
     /* 팝업들 */
     _HTML_PERMISSION_POPUP +
     _HTML_CALENDAR_POPUP +
-    _HTML_AI_POPUP;
+    _HTML_AI_POPUP +
+    _HTML_COMPARISON_POPUP;
 
   document.body.insertAdjacentHTML('afterbegin', html);
 })();

@@ -99,5 +99,76 @@ CREATE TRIGGER on_auth_user_created
 -- DELETE policy: (bucket_id = 'photos') AND (auth.uid()::text = (storage.foldername(name))[1])
 
 -- ============================================================
+-- STEP 6: 랭킹 시스템 — district_code 컬럼 & RPC 함수
+-- ============================================================
+
+-- 시/군/구 코드 컬럼 추가
+ALTER TABLE public.photos ADD COLUMN IF NOT EXISTS district_code TEXT;
+CREATE INDEX IF NOT EXISTS idx_photos_district ON public.photos (district_code);
+
+-- 랭킹 데이터 조회 (SECURITY DEFINER — RLS 우회하여 집계 데이터만 반환)
+CREATE OR REPLACE FUNCTION public.get_ranking(rank_scope TEXT DEFAULT 'national')
+RETURNS TABLE (
+  user_id UUID,
+  display_name TEXT,
+  avatar_url TEXT,
+  trash_count BIGINT,
+  total_impact NUMERIC,
+  top_district TEXT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    p.user_id,
+    pr.display_name,
+    pr.avatar_url,
+    COUNT(*)::BIGINT AS trash_count,
+    COALESCE(SUM(p.pollution_impact), 0) AS total_impact,
+    MODE() WITHIN GROUP (ORDER BY p.district_code) AS top_district
+  FROM public.photos p
+  JOIN public.profiles pr ON pr.id = p.user_id
+  GROUP BY p.user_id, pr.display_name, pr.avatar_url
+  ORDER BY COUNT(*) DESC
+  LIMIT 100;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 특정 유저의 경로 좌표 조회 (민감 데이터 미노출)
+CREATE OR REPLACE FUNCTION public.get_user_routes(target_user_id UUID)
+RETURNS TABLE (
+  latitude DOUBLE PRECISION,
+  longitude DOUBLE PRECISION,
+  district_code TEXT,
+  captured_at TIMESTAMPTZ
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT p.latitude, p.longitude, p.district_code, p.captured_at
+  FROM public.photos p
+  WHERE p.user_id = target_user_id
+    AND p.latitude IS NOT NULL
+    AND p.longitude IS NOT NULL
+  ORDER BY p.captured_at ASC;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 특정 유저의 시군구별 방문 빈도
+CREATE OR REPLACE FUNCTION public.get_user_district_stats(target_user_id UUID)
+RETURNS TABLE (
+  district_code TEXT,
+  visit_count BIGINT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT p.district_code, COUNT(*)::BIGINT
+  FROM public.photos p
+  WHERE p.user_id = target_user_id
+    AND p.district_code IS NOT NULL
+  GROUP BY p.district_code
+  ORDER BY COUNT(*) DESC;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================
 -- 완료!
 -- ============================================================

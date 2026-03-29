@@ -13,5 +13,8 @@ var AppState = {
   cameraStream: null,
   cameraActive: false,
   photos: [],
-  dashboardData: null
+  dashboardData: null,
+  rankingData: null,
+  comparisonTarget: null,
+  districtGeoJSON: null
 };

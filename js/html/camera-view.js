@@ -16,4 +16,5 @@ var _HTML_CAMERA_VIEW = '' +
       '</div>' +
     '</div>' +
     '<div id="capture-flash" class="capture-flash"></div>' +
+    '<button class="btn-capture-float" onclick="capturePhoto()"></button>' +
   '</div>';
