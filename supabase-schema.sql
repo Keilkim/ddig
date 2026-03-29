@@ -99,6 +99,19 @@ CREATE TRIGGER on_auth_user_created
 -- DELETE policy: (bucket_id = 'photos') AND (auth.uid()::text = (storage.foldername(name))[1])
 
 -- ============================================================
+-- STEP 5.5: 다른 유저 위치 데이터 조회 허용 (랭킹용)
+-- ============================================================
+
+-- 인증된 모든 유저가 다른 유저의 위치/카테고리 정보 조회 가능
+-- (storage_path, gemini_raw 등 민감 데이터는 RLS 기본 정책으로 차단)
+CREATE POLICY "photos_select_location_all" ON public.photos
+  FOR SELECT
+  USING (auth.uid() IS NOT NULL);
+
+-- 기존 본인 전용 정책 제거 후 위 정책으로 대체
+DROP POLICY IF EXISTS "photos_select_own" ON public.photos;
+
+-- ============================================================
 -- STEP 6: 랭킹 시스템 — district_code 컬럼 & RPC 함수
 -- ============================================================
 

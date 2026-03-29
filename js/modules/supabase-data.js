@@ -148,18 +148,31 @@ async function loadRankingData(scope) {
   return result.data || [];
 }
 
-/* ─── 특정 유저 경로 조회 (RPC) ─── */
+/* ─── 특정 유저 경로 조회 (RPC → fallback 직접 쿼리) ─── */
 async function loadUserRoutes(userId) {
-  if (!supabaseClient) { console.error('[loadUserRoutes] supabaseClient 없음'); return []; }
+  if (!supabaseClient) return [];
 
-  console.log('[loadUserRoutes] 호출:', userId);
+  // RPC 시도
   var result = await supabaseClient.rpc('get_user_routes', { target_user_id: userId });
-  console.log('[loadUserRoutes] 결과:', result);
-  if (result.error) {
-    console.error('경로 로드 실패:', result.error);
+
+  if (!result.error && result.data && result.data.length > 0) {
+    return result.data;
+  }
+
+  // RPC 실패 또는 빈 결과 → 직접 쿼리 fallback
+  console.log('[loadUserRoutes] RPC 빈 결과, 직접 쿼리 시도:', userId);
+  var fallback = await supabaseClient
+    .from('photos')
+    .select('latitude, longitude, district_code, captured_at')
+    .eq('user_id', userId)
+    .not('latitude', 'is', null)
+    .order('captured_at', { ascending: true });
+
+  if (fallback.error) {
+    console.error('경로 직접 쿼리 실패:', fallback.error);
     return [];
   }
-  return result.data || [];
+  return fallback.data || [];
 }
 
 /* ─── 특정 유저 시군구별 통계 (RPC) ─── */
