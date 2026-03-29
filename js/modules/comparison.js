@@ -5,34 +5,7 @@
    ════════════════════════════════════════ */
 
 var _comparisonMap = null;
-
-/* ─── 다크 맵 타일 URL ─── */
 var _DARK_TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-
-/* ─── 날짜별 경로 색상 팔레트 ─── */
-var _ROUTE_COLORS = [
-  '#34C759', '#5AC8FA', '#FFD60A', '#FF9F0A',
-  '#BF5AF2', '#FF375F', '#64D2FF', '#30D158'
-];
-
-/* ─── 포인트를 날짜별로 그룹핑 ─── */
-function _groupByDate(routes) {
-  var groups = {};
-  var order = [];
-  for (var i = 0; i < routes.length; i++) {
-    var r = routes[i];
-    if (!r.latitude || !r.longitude) continue;
-    var dayKey = (r.captured_at || '').substring(0, 10);
-    if (!dayKey) continue;
-    if (!groups[dayKey]) {
-      groups[dayKey] = [];
-      order.push(dayKey);
-    }
-    groups[dayKey].push([r.latitude, r.longitude]);
-  }
-  order.sort();
-  return { groups: groups, order: order };
-}
 
 /* ─── 상대방 경로 맵 열기 ─── */
 async function openComparisonMap(targetUserId, targetDisplayName) {
@@ -46,13 +19,14 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
   var userBar = document.getElementById('comparison-user-bar');
   if (userBar) {
     userBar.innerHTML =
-      '<div class="comparison-user"><span class="comparison-user-dot" style="background:#34C759"></span>' + targetDisplayName + '의 경로</div>';
+      '<div class="comparison-user"><span class="comparison-user-dot" style="background:#34C759"></span>' + targetDisplayName + '의 전체 경로</div>';
   }
 
   var mapEl = document.getElementById('comparison-map');
   if (!mapEl) return;
   mapEl.innerHTML = '<div class="ranking-empty"><div class="ranking-spinner"></div><div style="margin-top:12px;font-size:12px;color:var(--color-tertiary)">경로 불러오는 중...</div></div>';
 
+  // 데이터 로드
   var isSelf = AppState.user && targetUserId === AppState.user.id;
   var results = await Promise.all([
     isSelf ? loadUserPhotos() : loadUserRoutes(targetUserId),
@@ -62,22 +36,25 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
   var targetRoutes = results[0];
   var targetDistrictStats = results[1];
 
-  // 경로 데이터 없으면 안내
-  if (!targetRoutes || targetRoutes.length === 0) {
+  // 포인트 추출
+  var points = [];
+  for (var i = 0; i < targetRoutes.length; i++) {
+    var r = targetRoutes[i];
+    if (r.latitude && r.longitude) {
+      points.push([r.latitude, r.longitude]);
+    }
+  }
+
+  if (points.length === 0) {
     mapEl.innerHTML =
       '<div class="ranking-empty">' +
         '<div style="font-size:40px;margin-bottom:12px">📍</div>' +
         '<div>' + targetDisplayName + '님의 경로 데이터가 없습니다</div>' +
         '<div style="margin-top:8px;font-size:12px;color:var(--color-tertiary)">GPS 정보가 있는 플로깅 기록이 필요합니다</div>' +
       '</div>';
-    renderComparisonStats([], targetDisplayName);
+    renderComparisonStats(0, 0);
     return;
   }
-
-  // 날짜별 그룹핑
-  var dated = _groupByDate(targetRoutes);
-  var dayGroups = dated.groups;
-  var dayOrder = dated.order;
 
   // 맵 렌더링
   mapEl.innerHTML = '';
@@ -93,7 +70,7 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
   });
   L.tileLayer(_DARK_TILE_URL, { maxZoom: 19 }).addTo(_comparisonMap);
 
-  // GeoJSON 바운더리 레이어
+  // 시군구 바운더리
   var geojson = _districtGeoJSON || AppState.districtGeoJSON;
   if (geojson) {
     var districtVisits = {};
@@ -129,89 +106,62 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
     }).addTo(_comparisonMap);
   }
 
-  // 날짜별 경로 그리기
-  var allPoints = [];
-  var legendHtml = '';
-
-  for (var idx = 0; idx < dayOrder.length; idx++) {
-    var day = dayOrder[idx];
-    var points = dayGroups[day];
-    var color = _ROUTE_COLORS[idx % _ROUTE_COLORS.length];
-    var label = day.substring(5); // MM-DD
-
-    // 폴리라인 (해당 날짜 포인트끼리만 연결)
-    if (points.length > 1) {
-      L.polyline(points, { color: color, weight: 3, opacity: 0.85 }).addTo(_comparisonMap);
-    }
-
-    // 마커
-    for (var k = 0; k < points.length; k++) {
-      L.circleMarker(points[k], {
-        radius: 4, fillColor: color, color: 'rgba(0,0,0,0.3)',
-        weight: 1.5, fillOpacity: 0.9
-      }).addTo(_comparisonMap);
-    }
-
-    allPoints = allPoints.concat(points);
-    legendHtml += '<span class="legend-item"><span class="legend-dot" style="background:' + color + '"></span>' + label + ' (' + points.length + '개)</span>';
+  // 전체 경로 한번에 그리기
+  if (points.length > 1) {
+    L.polyline(points, { color: '#34C759', weight: 3, opacity: 0.85 }).addTo(_comparisonMap);
+  }
+  for (var k = 0; k < points.length; k++) {
+    L.circleMarker(points[k], {
+      radius: 4, fillColor: '#34C759', color: 'rgba(0,0,0,0.3)',
+      weight: 1.5, fillOpacity: 0.9
+    }).addTo(_comparisonMap);
   }
 
-  // 레전드 업데이트
+  // 레전드
   var legendEl = popup.querySelector('.comparison-legend');
   if (legendEl) {
-    legendEl.innerHTML = legendHtml;
+    legendEl.innerHTML =
+      '<span class="legend-item"><span class="legend-dot" style="background:#34C759"></span>경로 (' + points.length + '곳)</span>' +
+      '<span class="legend-item"><span class="legend-dot legend-dot-area" style="background:rgba(52,199,89,0.35)"></span>활동 지역</span>';
   }
 
-  // 맵 범위
+  // fitBounds
   setTimeout(function() {
     if (!_comparisonMap) return;
     _comparisonMap.invalidateSize();
-    if (allPoints.length > 0) {
-      _comparisonMap.fitBounds(allPoints, { padding: [30, 30] });
-    } else {
-      _comparisonMap.setView([37.5665, 126.978], 11);
-    }
+    _comparisonMap.fitBounds(points, { padding: [30, 30] });
   }, 200);
 
-  // 통계
-  renderComparisonStats(targetRoutes, targetDisplayName, dayOrder.length);
+  // 거리 계산
+  var totalDist = 0;
+  for (var j = 1; j < points.length; j++) {
+    totalDist += haversine(
+      { lat: points[j - 1][0], lng: points[j - 1][1] },
+      { lat: points[j][0], lng: points[j][1] }
+    );
+  }
+
+  renderComparisonStats(targetRoutes.length, totalDist);
 }
 
 /* ─── 통계 렌더링 ─── */
-function renderComparisonStats(targetRoutes, targetName, dayCount) {
+function renderComparisonStats(count, dist) {
   var statsEl = document.getElementById('comparison-stats');
   if (!statsEl) return;
-
-  var targetCount = targetRoutes.length;
-
-  // 날짜별로 거리 계산 (날짜 넘는 구간은 제외)
-  var dated = _groupByDate(targetRoutes);
-  var totalDist = 0;
-  for (var day in dated.groups) {
-    var pts = dated.groups[day];
-    for (var j = 1; j < pts.length; j++) {
-      totalDist += haversine(
-        { lat: pts[j - 1][0], lng: pts[j - 1][1] },
-        { lat: pts[j][0], lng: pts[j][1] }
-      );
-    }
-  }
-
-  var targetScore = targetCount * 10;
 
   statsEl.innerHTML =
     '<div class="comparison-stat-row">' +
       '<div class="comparison-stat-card">' +
         '<div class="comparison-stat-card-label">수거량</div>' +
-        '<div class="comparison-stat-card-value">' + targetCount + '<span class="comparison-stat-unit">개</span></div>' +
+        '<div class="comparison-stat-card-value">' + count + '<span class="comparison-stat-unit">개</span></div>' +
       '</div>' +
       '<div class="comparison-stat-card">' +
         '<div class="comparison-stat-card-label">이동거리</div>' +
-        '<div class="comparison-stat-card-value">' + totalDist.toFixed(2) + '<span class="comparison-stat-unit">km</span></div>' +
+        '<div class="comparison-stat-card-value">' + dist.toFixed(2) + '<span class="comparison-stat-unit">km</span></div>' +
       '</div>' +
       '<div class="comparison-stat-card">' +
-        '<div class="comparison-stat-card-label">활동일</div>' +
-        '<div class="comparison-stat-card-value">' + (dayCount || 0) + '<span class="comparison-stat-unit">일</span></div>' +
+        '<div class="comparison-stat-card-label">점수</div>' +
+        '<div class="comparison-stat-card-value">' + (count * 10).toLocaleString() + '<span class="comparison-stat-unit">pt</span></div>' +
       '</div>' +
     '</div>';
 }
@@ -221,8 +171,5 @@ function closeComparisonMap() {
   var popup = document.getElementById('comparison-popup');
   if (popup) popup.classList.remove('active');
 
-  if (_comparisonMap) {
-    _comparisonMap.remove();
-    _comparisonMap = null;
-  }
+  if (_comparisonMap) { _comparisonMap.remove(); _comparisonMap = null; }
 }
