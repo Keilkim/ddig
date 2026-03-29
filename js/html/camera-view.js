@@ -5,24 +5,15 @@ var _HTML_CAMERA_VIEW = '' +
     '<video id="camera-feed" autoplay playsinline muted></video>' +
     '<canvas id="camera-canvas" class="hidden"></canvas>' +
 
-    /* 상단 카메라 컨트롤 바 */
+    /* 상단: 플래시 + 전환 */
     '<div class="camera-top-bar">' +
       '<button class="camera-ctrl-btn" id="btn-flash" onclick="toggleFlash()">' +
         '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>' +
         '<span class="camera-ctrl-label" id="flash-label">OFF</span>' +
       '</button>' +
-      '<div class="camera-zoom-ctrl">' +
-        '<button class="camera-zoom-btn" onclick="cameraZoomOut()">-</button>' +
-        '<span class="camera-zoom-level" id="camera-zoom-level">1.0x</span>' +
-        '<button class="camera-zoom-btn" onclick="cameraZoomIn()">+</button>' +
-      '</div>' +
       '<button class="camera-ctrl-btn" onclick="toggleCameraFacing()">' +
         '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>' +
         '<span class="camera-ctrl-label">전환</span>' +
-      '</button>' +
-      '<button class="camera-ctrl-btn camera-stop-btn" onclick="stopCameraManual()">' +
-        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-        '<span class="camera-ctrl-label">종료</span>' +
       '</button>' +
     '</div>' +
 
@@ -38,5 +29,18 @@ var _HTML_CAMERA_VIEW = '' +
       '</div>' +
     '</div>' +
     '<div id="capture-flash" class="capture-flash"></div>' +
-    '<button class="btn-capture-float" onclick="capturePhoto()"></button>' +
+
+    /* 하단: 줌 | 촬영 | 종료 */
+    '<div class="camera-bottom-bar">' +
+      '<div class="camera-zoom-ctrl">' +
+        '<button class="camera-zoom-btn" onclick="cameraZoomOut()">-</button>' +
+        '<span class="camera-zoom-level" id="camera-zoom-level">1.0x</span>' +
+        '<button class="camera-zoom-btn" onclick="cameraZoomIn()">+</button>' +
+      '</div>' +
+      '<button class="btn-capture-float" onclick="capturePhoto()"></button>' +
+      '<button class="camera-ctrl-btn camera-stop-btn" onclick="stopCameraManual()">' +
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+        '<span class="camera-ctrl-label">종료</span>' +
+      '</button>' +
+    '</div>' +
   '</div>';
