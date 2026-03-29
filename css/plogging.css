@@ -127,6 +127,13 @@
   text-align: center;
 }
 
+.camera-stop-btn {
+  color: var(--color-red);
+}
+.camera-stop-btn svg {
+  stroke: var(--color-red);
+}
+
 /* 카메라 가이드 오버레이 */
 .camera-guide-overlay {
   position: absolute;

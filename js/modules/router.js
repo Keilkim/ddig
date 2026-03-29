@@ -59,15 +59,15 @@ function rejectPermission() {
 
 /* ─── 네비게이션 함수 ─── */
 function goToDashboard() {
+  stopCamera();
+  AppState.cameraActive = false;
   showView('dashboard');
   loadDashboard();
 }
 
 function goToHome() {
   showView('plogging');
-  if (AppState.cameraActive) {
-    ensureCameraPlaying();
-  }
+  startCameraManual();
 }
 
 function openCalendar() {

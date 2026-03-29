@@ -94,6 +94,23 @@ function captureFrame() {
   });
 }
 
+/* ─── 카메라 수동 종료 ─── */
+function stopCameraManual() {
+  stopCamera();
+  _flashOn = false;
+  _cameraZoom = 1.0;
+  AppState.cameraActive = false;
+
+  var placeholder = document.getElementById('camera-placeholder');
+  if (placeholder) placeholder.classList.remove('hidden');
+
+  var label = document.getElementById('flash-label');
+  var btn = document.getElementById('btn-flash');
+  if (label) label.textContent = 'OFF';
+  if (btn) btn.classList.remove('camera-ctrl-btn-active');
+  _updateZoomLabel();
+}
+
 /* ─── 카메라 수동 시작 ─── */
 function startCameraManual() {
   initCamera().then(function() {
