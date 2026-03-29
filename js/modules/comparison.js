@@ -55,9 +55,13 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
     return;
   }
 
-  // 맵 렌더링
+  // 맵 렌더링 — 컨테이너 크기 보장
   mapEl.innerHTML = '';
+  mapEl.style.minHeight = '300px';
   if (_comparisonMap) { _comparisonMap.remove(); _comparisonMap = null; }
+
+  // 팝업 렌더링 완료 대기 후 맵 생성
+  await new Promise(function(r) { setTimeout(r, 100); });
 
   _comparisonMap = L.map(mapEl, {
     zoomControl: false,
@@ -68,6 +72,7 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
     doubleClickZoom: true
   });
   L.tileLayer(_DARK_TILE_URL, { maxZoom: 19 }).addTo(_comparisonMap);
+  _comparisonMap.invalidateSize();
 
   // 시군구 바운더리
   var geojson = _districtGeoJSON || AppState.districtGeoJSON;
@@ -124,12 +129,15 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
       '<span class="legend-item"><span class="legend-dot legend-dot-area" style="background:rgba(52,199,89,0.35)"></span>활동 지역</span>';
   }
 
-  // fitBounds
-  setTimeout(function() {
+  // fitBounds — 여러번 시도하여 확실하게
+  var doBounds = function() {
     if (!_comparisonMap) return;
     _comparisonMap.invalidateSize();
     _comparisonMap.fitBounds(points, { padding: [30, 30] });
-  }, 200);
+  };
+  setTimeout(doBounds, 100);
+  setTimeout(doBounds, 400);
+  setTimeout(doBounds, 800);
 
   // 거리 계산
   var totalDist = 0;
