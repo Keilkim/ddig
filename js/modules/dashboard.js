@@ -7,6 +7,13 @@
 var _chartTrashType = null;
 var _routeMap = null;
 
+/* ─── Chart.js 다크 테마 기본값 ─── */
+if (typeof Chart !== 'undefined') {
+  Chart.defaults.color = '#98989D';
+  Chart.defaults.borderColor = 'rgba(84, 84, 88, 0.35)';
+  Chart.defaults.plugins.legend.labels.color = '#98989D';
+}
+
 /* ─── 대쉬보드 로드 ─── */
 async function loadDashboard(date) {
   var targetDate = date || new Date();

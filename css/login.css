@@ -89,9 +89,9 @@
   height: 27px;
   left: 2px;
   bottom: 2px;
-  background: var(--color-white);
+  background: #fff;
   border-radius: 50%;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   transition: transform 0.25s;
 }
 

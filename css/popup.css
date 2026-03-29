@@ -36,7 +36,7 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
-  background: var(--color-separator);
+  background: rgba(84, 84, 88, 0.35);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
@@ -46,7 +46,7 @@
   padding: 14px;
   font-size: var(--font-size-md);
   font-weight: 400;
-  background: var(--color-white);
+  background: #2C2C2E;
   border-radius: 0;
 }
 
@@ -84,12 +84,12 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--color-fill);
+  background: rgba(120, 120, 128, 0.24);
   font-size: var(--font-size-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-label);
+  color: #fff;
 }
 
 .calendar-weekdays {
@@ -122,7 +122,7 @@
   position: relative;
 }
 
-.cal-day:hover { background: var(--color-fill); }
+.cal-day:hover { background: rgba(120, 120, 128, 0.24); }
 .cal-day.today { font-weight: 700; color: var(--color-blue); }
 .cal-day.has-activity {
   background: var(--color-green);
@@ -155,7 +155,7 @@
   width: 100%;
   margin-top: var(--space-md);
   padding: 12px;
-  background: var(--color-fill);
+  background: rgba(120, 120, 128, 0.24);
   border-radius: var(--radius-md);
   font-size: var(--font-size-md);
   color: var(--color-blue);
@@ -209,7 +209,7 @@
   width: 100%;
   margin-top: var(--space-lg);
   padding: 14px;
-  background: var(--color-fill);
+  background: rgba(120, 120, 128, 0.24);
   border-radius: var(--radius-md);
   font-size: var(--font-size-md);
   color: var(--color-blue);
@@ -227,7 +227,7 @@
   border-radius: 0;
   display: flex;
   flex-direction: column;
-  background: var(--color-bg);
+  background: #000;
   padding: 0;
 }
 
@@ -248,11 +248,11 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--color-fill);
+  background: rgba(120, 120, 128, 0.24);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-label);
+  color: #fff;
   flex-shrink: 0;
   border: none;
   cursor: pointer;

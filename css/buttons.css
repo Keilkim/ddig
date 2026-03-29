@@ -1,16 +1,16 @@
 /* ========================================
-   버튼 — Apple 스타일
+   버튼 — Apple 스타일 (다크 모드)
    ======================================== */
 
 #view-dashboard .btn-group {
-  background: var(--color-glass);
+  background: var(--color-glass-dark);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 0.5px solid var(--color-separator);
 }
 
 #view-dashboard .btn-group-item {
-  color: var(--color-secondary);
+  color: rgba(255,255,255,0.85);
   font-size: var(--font-size-sm);
   font-weight: 500;
 }
