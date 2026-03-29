@@ -27,10 +27,9 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
   mapEl.innerHTML = '<div class="ranking-empty"><div class="ranking-spinner"></div><div style="margin-top:12px;font-size:12px;color:var(--color-tertiary)">경로 불러오는 중...</div></div>';
 
   // 데이터 로드
-  var isSelf = AppState.user && targetUserId === AppState.user.id;
   var results = await Promise.all([
-    isSelf ? loadUserPhotos() : loadUserRoutes(targetUserId),
-    isSelf ? loadUserDistrictStats(AppState.user.id) : loadUserDistrictStats(targetUserId)
+    loadUserRoutes(targetUserId),
+    loadUserDistrictStats(targetUserId)
   ]);
 
   var targetRoutes = results[0];

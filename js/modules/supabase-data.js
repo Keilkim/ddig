@@ -136,55 +136,124 @@ async function loadPhotosByPeriod(periodKey) {
   return result.data || [];
 }
 
-/* ─── 랭킹 데이터 조회 (RPC) ─── */
+/* ─── 랭킹 데이터 조회 (직접 쿼리) ─── */
 async function loadRankingData(scope) {
   if (!supabaseClient) return [];
 
-  var result = await supabaseClient.rpc('get_ranking', { rank_scope: scope || 'national' });
+  // 모든 유저의 사진 데이터 조회
+  var result = await supabaseClient
+    .from('photos')
+    .select('user_id, trash_category, pollution_impact, district_code');
+
   if (result.error) {
     console.error('랭킹 로드 실패:', result.error);
     return [];
   }
-  return result.data || [];
+
+  var photos = result.data || [];
+
+  // 유저별 집계
+  var userMap = {};
+  for (var i = 0; i < photos.length; i++) {
+    var p = photos[i];
+    if (!userMap[p.user_id]) {
+      userMap[p.user_id] = { user_id: p.user_id, trash_count: 0, total_impact: 0, districts: {} };
+    }
+    var u = userMap[p.user_id];
+    u.trash_count++;
+    u.total_impact += Number(p.pollution_impact) || 0;
+    if (p.district_code) {
+      u.districts[p.district_code] = (u.districts[p.district_code] || 0) + 1;
+    }
+  }
+
+  // 프로필 정보 조회
+  var profiles = await supabaseClient.from('profiles').select('id, display_name, avatar_url');
+  var profMap = {};
+  if (profiles.data) {
+    for (var j = 0; j < profiles.data.length; j++) {
+      profMap[profiles.data[j].id] = profiles.data[j];
+    }
+  }
+
+  // 결과 조합
+  var ranking = [];
+  for (var uid in userMap) {
+    var data = userMap[uid];
+    var prof = profMap[uid] || {};
+    // top_district 찾기
+    var topDist = '';
+    var topCount = 0;
+    for (var dc in data.districts) {
+      if (data.districts[dc] > topCount) {
+        topCount = data.districts[dc];
+        topDist = dc;
+      }
+    }
+    ranking.push({
+      user_id: uid,
+      display_name: prof.display_name || '익명',
+      avatar_url: prof.avatar_url || '',
+      trash_count: data.trash_count,
+      total_impact: data.total_impact,
+      top_district: topDist
+    });
+  }
+
+  ranking.sort(function(a, b) { return b.trash_count - a.trash_count; });
+  console.log('[loadRankingData] 유저 수:', ranking.length);
+  return ranking;
 }
 
-/* ─── 특정 유저 경로 조회 (RPC → fallback 직접 쿼리) ─── */
+/* ─── 특정 유저 경로 조회 (직접 쿼리) ─── */
 async function loadUserRoutes(userId) {
   if (!supabaseClient) return [];
 
-  // RPC 시도
-  var result = await supabaseClient.rpc('get_user_routes', { target_user_id: userId });
-
-  if (!result.error && result.data && result.data.length > 0) {
-    return result.data;
-  }
-
-  // RPC 실패 또는 빈 결과 → 직접 쿼리 fallback
-  console.log('[loadUserRoutes] RPC 빈 결과, 직접 쿼리 시도:', userId);
-  var fallback = await supabaseClient
+  var result = await supabaseClient
     .from('photos')
     .select('latitude, longitude, district_code, captured_at')
     .eq('user_id', userId)
     .not('latitude', 'is', null)
+    .not('longitude', 'is', null)
     .order('captured_at', { ascending: true });
 
-  if (fallback.error) {
-    console.error('경로 직접 쿼리 실패:', fallback.error);
+  console.log('[loadUserRoutes]', userId, '→', result.data ? result.data.length : 0, '건', result.error || '');
+  if (result.error) {
+    console.error('경로 로드 실패:', result.error);
     return [];
   }
-  return fallback.data || [];
+  return result.data || [];
 }
 
-/* ─── 특정 유저 시군구별 통계 (RPC) ─── */
+/* ─── 특정 유저 시군구별 통계 (직접 쿼리) ─── */
 async function loadUserDistrictStats(userId) {
   if (!supabaseClient) return [];
 
-  var result = await supabaseClient.rpc('get_user_district_stats', { target_user_id: userId });
+  var result = await supabaseClient
+    .from('photos')
+    .select('district_code')
+    .eq('user_id', userId)
+    .not('district_code', 'is', null);
+
   if (result.error) {
     console.error('시군구 통계 로드 실패:', result.error);
     return [];
   }
-  return result.data || [];
+
+  // 클라이언트에서 집계
+  var counts = {};
+  var data = result.data || [];
+  for (var i = 0; i < data.length; i++) {
+    var dc = data[i].district_code;
+    counts[dc] = (counts[dc] || 0) + 1;
+  }
+
+  var stats = [];
+  for (var code in counts) {
+    stats.push({ district_code: code, visit_count: counts[code] });
+  }
+  stats.sort(function(a, b) { return b.visit_count - a.visit_count; });
+  return stats;
 }
 
 /* ─── 기존 사진 district_code 백필 (1회) ─── */
