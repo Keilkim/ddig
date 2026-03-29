@@ -150,9 +150,11 @@ async function loadRankingData(scope) {
 
 /* ─── 특정 유저 경로 조회 (RPC) ─── */
 async function loadUserRoutes(userId) {
-  if (!supabaseClient) return [];
+  if (!supabaseClient) { console.error('[loadUserRoutes] supabaseClient 없음'); return []; }
 
+  console.log('[loadUserRoutes] 호출:', userId);
   var result = await supabaseClient.rpc('get_user_routes', { target_user_id: userId });
+  console.log('[loadUserRoutes] 결과:', result);
   if (result.error) {
     console.error('경로 로드 실패:', result.error);
     return [];

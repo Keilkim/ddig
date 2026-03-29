@@ -33,6 +33,8 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
 
   // 데이터 병렬 로드
   var isSelf = AppState.user && targetUserId === AppState.user.id;
+  console.log('[비교맵] 유저:', targetUserId, 'isSelf:', isSelf);
+
   var results = await Promise.all([
     isSelf ? loadUserPhotos() : loadUserRoutes(targetUserId),
     isSelf ? loadUserDistrictStats(AppState.user.id) : loadUserDistrictStats(targetUserId)
@@ -40,6 +42,24 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
 
   var targetRoutes = results[0];
   var targetDistrictStats = results[1];
+
+  console.log('[비교맵] 경로 데이터:', targetRoutes ? targetRoutes.length : 0, '건');
+  console.log('[비교맵] 시군구 통계:', targetDistrictStats ? targetDistrictStats.length : 0, '건');
+  if (targetRoutes && targetRoutes.length > 0) {
+    console.log('[비교맵] 첫 포인트:', targetRoutes[0]);
+  }
+
+  // 경로 데이터 없으면 안내
+  if (!targetRoutes || targetRoutes.length === 0) {
+    mapEl.innerHTML =
+      '<div class="ranking-empty">' +
+        '<div style="font-size:40px;margin-bottom:12px">📍</div>' +
+        '<div>' + targetDisplayName + '님의 경로 데이터가 없습니다</div>' +
+        '<div style="margin-top:8px;font-size:12px;color:var(--color-tertiary)">GPS 정보가 있는 플로깅 기록이 필요합니다</div>' +
+      '</div>';
+    renderComparisonStats(targetRoutes || [], targetDisplayName);
+    return;
+  }
 
   // 맵 렌더링
   mapEl.innerHTML = '';
