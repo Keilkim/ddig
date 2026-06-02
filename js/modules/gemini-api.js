@@ -7,7 +7,8 @@
    + 로컬 키워드 분류기로 카테고리 보정
    ════════════════════════════════════════ */
 
-var GEMINI_MODEL = 'gemini-2.0-flash';
+// gemini-2.0-flash는 2026-06-01 서비스 종료 → gemini-3.5-flash(GA, 비전 지원)로 업그레이드
+var GEMINI_MODEL = 'gemini-3.5-flash';
 
 /*
  * 분류 근거: 환경부고시 제2022-254호
@@ -236,8 +237,9 @@ async function analyzePhoto(base64Image) {
       ]
     }],
     generationConfig: {
-      temperature: 0.1,
-      maxOutputTokens: 1024
+      // Gemini 3.x는 temperature 기본값(1.0) 유지 권장 — 낮추면 looping/품질저하 가능하여 미지정
+      thinkingConfig: { thinkingLevel: 'low' }, // 행사용 빠른 분류 — 사고량 최소화로 지연·비용 절감
+      maxOutputTokens: 2048                       // thinking 토큰이 출력 예산을 함께 소모 → 여유 확보(JSON 잘림 방지)
     }
   };
 
@@ -249,7 +251,9 @@ async function analyzePhoto(base64Image) {
     });
 
     if (!response.ok) {
-      console.error('Gemini API 오류:', response.status);
+      // 응답 본문까지 로깅 — 모델명/필드 오류 등 원인을 콘솔에서 바로 확인
+      var errText = await response.text().catch(function() { return ''; });
+      console.error('Gemini API 오류:', response.status, errText);
       return null;
     }
 

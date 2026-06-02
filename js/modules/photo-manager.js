@@ -35,8 +35,17 @@ async function capturePhoto() {
     hideAnalyzingOverlay();
 
     if (!analysis) {
-      _pendingCapture = { blob: blob, loc: loc, analysis: null };
-      showConfirmModal(blob, null);
+      // AI 분석 실패(네트워크/쿼터/모델 오류 등) — "쓰레기 발견"으로 위장하지 말 것.
+      // 직접 분류해 저장하거나 다시 촬영할 수 있게 실패 모달을 띄운다.
+      var manual = {
+        is_trash: true,
+        trash_category: 'other',
+        pollution_impact: computePollutionImpact('other'),
+        description: '',
+        objects: []
+      };
+      _pendingCapture = { blob: blob, loc: loc, analysis: manual };
+      showAnalysisFailedModal(blob, manual);
       return;
     }
 
@@ -101,6 +110,37 @@ function showNotTrashModal(blob, analysis) {
       '<p class="detection-modal-desc">' + (analysis.description || '쓰레기가 감지되지 않았습니다') + '</p>' +
       '<div class="detection-modal-actions">' +
         '<button class="detection-btn detection-btn-close" onclick="closeDetectionModal()">확인</button>' +
+      '</div>' +
+    '</div>';
+
+  document.body.appendChild(modal);
+  setTimeout(function() { modal.classList.add('show'); }, 10);
+}
+
+/* ─── AI 분석 실패 모달 (직접 분류 후 저장 가능) ─── */
+function showAnalysisFailedModal(blob, analysis) {
+  var existing = document.getElementById('detection-modal');
+  if (existing) existing.remove();
+
+  var modal = document.createElement('div');
+  modal.id = 'detection-modal';
+  modal.className = 'detection-modal';
+
+  var imgUrl = URL.createObjectURL(blob);
+
+  modal.innerHTML =
+    '<div class="detection-modal-card analysis-failed-card">' +
+      '<div class="detection-modal-header">' +
+        '<h3 class="detection-modal-title">AI 분석 실패</h3>' +
+      '</div>' +
+      '<div class="detection-modal-img-wrap">' +
+        '<img src="' + imgUrl + '" class="detection-modal-img" />' +
+      '</div>' +
+      '<p class="detection-modal-desc">네트워크 또는 AI 응답 문제로 자동 분류에 실패했습니다. 직접 분류해서 저장하거나 다시 촬영하세요.</p>' +
+      buildCategorySelect(analysis.trash_category) +
+      '<div class="detection-modal-actions">' +
+        '<button class="detection-btn detection-btn-cancel" onclick="cancelCapture()">다시 촬영</button>' +
+        '<button class="detection-btn detection-btn-save" onclick="confirmCapture()">저장하기</button>' +
       '</div>' +
     '</div>';
 
