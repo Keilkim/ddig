@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#6BCB8B">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>DIGG X GONGSIM</title>
@@ -18,19 +18,17 @@
 </head>
 <body class="safe-area-top safe-area-bottom">
   <div id="login-view" class="login-view">
-    <!-- Row 1: 앱 이름 -->
-    <div class="login-logo">
-      <h1 class="app-title">DIGG</h1>
-      <p class="app-subtitle">× GONGSIM</p>
-    </div>
+    <!-- 브랜딩은 배경 이미지(images/login-bg.png)가 담당 -->
 
-    <!-- Row 2: 구글 로그인 버튼 -->
+    <!-- 구글 로그인 영역 — 행사 중 임시 숨김. 복구하려면 아래 div의 hidden 속성만 제거 -->
+    <div id="oauth-area" hidden>
+    <!-- Row 1: 구글 로그인 버튼 -->
     <button id="btn-google-login" class="btn-google" onclick="loginWithGoogle()">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.03 24.03 0 0 0 0 21.56l7.98-6.19z"/><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       구글 계정으로 로그인
     </button>
 
-    <!-- Row 3: 자동 로그인 -->
+    <!-- Row 2: 자동 로그인 -->
     <div class="auto-login-area">
       <label class="auto-login-toggle">
         <input type="checkbox" id="chk-auto-login" onchange="toggleAutoLogin(this.checked)">
@@ -39,14 +37,43 @@
       <span class="auto-login-label">자동 로그인</span>
     </div>
 
-    <!-- Row 4: 계정 전환 -->
+    <!-- Row 3: 계정 전환 -->
     <button id="btn-switch-account" class="btn-switch" onclick="switchAccount()">
       다른 계정으로 전환
     </button>
+
+    <!-- 구분선(또는)도 구글 영역과 함께 숨김 -->
+    <div class="login-divider"><span>또는</span></div>
+    </div><!-- /#oauth-area -->
+
+    <!-- 간편 시작 (이름 + 소속 + 핸드폰 뒤 4자리) -->
+    <form class="simple-form" onsubmit="event.preventDefault(); startSimpleLogin();">
+      <input id="simple-name" class="simple-input" type="text" placeholder="이름" autocomplete="off" maxlength="20">
+      <input id="simple-affiliation" class="simple-input" type="text" placeholder="소속 (팀 / 단체)" autocomplete="off" maxlength="30">
+      <input id="simple-phone4" class="simple-input" type="text" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="핸드폰 번호 뒤 4자리">
+      <button type="submit" class="btn-simple">간편 시작하기</button>
+    </form>
   </div>
 
   <!-- Auth Module -->
   <script src="js/modules/state.js"></script>
   <script src="js/modules/auth.js"></script>
+
+  <!-- 페이지 초기화: 자동 로그인 체크박스 복원 + 자동 로그인 시도 -->
+  <script>
+    (function() {
+      var chk = document.getElementById('chk-auto-login');
+      if (chk) chk.checked = localStorage.getItem('digg_auto_login') === 'true';
+      if (typeof checkAutoLogin === 'function') checkAutoLogin();
+    })();
+
+    // 간편 시작 — 이름 + 소속 + 핸드폰 뒤 4자리
+    function startSimpleLogin() {
+      var name = document.getElementById('simple-name').value;
+      var affiliation = document.getElementById('simple-affiliation').value;
+      var phone4 = document.getElementById('simple-phone4').value;
+      signUpOrLoginSimple(name, affiliation, phone4);
+    }
+  </script>
 </body>
 </html>

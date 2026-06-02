@@ -118,7 +118,8 @@ function showConfirmModal(blob, analysis) {
   modal.className = 'detection-modal';
 
   var imgUrl = URL.createObjectURL(blob);
-  var categoryLabel = getCategoryLabel(analysis ? analysis.trash_category : 'other');
+  var categoryKey = analysis ? (analysis.trash_category || 'other') : 'other';
+  var categoryLabel = getCategoryLabel(categoryKey);
 
   modal.innerHTML =
     '<div class="detection-modal-card trash-card">' +
@@ -128,7 +129,7 @@ function showConfirmModal(blob, analysis) {
       '<div class="detection-modal-img-wrap" id="detection-img-wrap">' +
         '<img src="' + imgUrl + '" class="detection-modal-img" id="detection-img" />' +
         '<div class="detection-bbox-container" id="detection-bbox-container"></div>' +
-        '<div class="detection-badge trash-badge">' + categoryLabel + '</div>' +
+        '<div class="detection-badge trash-badge">' + categoryIconImg(categoryKey, { cls: 'category-icon', fallback: '' }) + categoryLabel + '</div>' +
       '</div>' +
       (analysis ? '<p class="detection-modal-desc">' + (analysis.description || '') + '</p>' : '') +
       (analysis ? buildCategorySelect(analysis.trash_category) : '') +
@@ -187,9 +188,6 @@ function renderBoundingBoxes(objects) {
   container.style.width = dispW + 'px';
   container.style.height = dispH + 'px';
 
-  console.log('[bbox 렌더링] img:', imgRect.width, 'x', imgRect.height,
-    'disp:', dispW, 'x', dispH, 'offset:', offsetX, offsetY);
-
   for (var i = 0; i < objects.length; i++) {
     var obj = objects[i];
     if (!obj.bbox || obj.bbox.length < 4) continue;
@@ -201,8 +199,6 @@ function renderBoundingBoxes(objects) {
     var y2 = obj.bbox[3] / 1000;
 
     if (x2 - x1 < 0.01 || y2 - y1 < 0.01) continue;
-
-    console.log('[bbox]', obj.label, 'raw:', obj.bbox, '→ norm:', x1, y1, x2, y2);
 
     var box = document.createElement('div');
     box.className = 'detection-bbox';
@@ -238,6 +234,8 @@ function buildCategorySelect(selectedCategory) {
 function onCategoryChange(newCategory) {
   if (_pendingCapture && _pendingCapture.analysis) {
     _pendingCapture.analysis.trash_category = newCategory;
+    // 카테고리가 바뀌면 오염도 점수도 함께 갱신
+    _pendingCapture.analysis.pollution_impact = computePollutionImpact(newCategory);
   }
   var badge = document.querySelector('.detection-badge.trash-badge');
   if (badge) {

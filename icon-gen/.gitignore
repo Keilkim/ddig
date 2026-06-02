@@ -1,0 +1,7 @@
+# API 키 — 절대 커밋 금지
+.env
+.env.local
+
+# 생성 결과물
+output/*
+!output/.gitkeep

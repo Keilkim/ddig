@@ -6,13 +6,14 @@
 
 var _chartTrashType = null;
 var _routeMap = null;
-var _DARK_TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+var _routeMapToken = 0;  // 비동기 위치 조회 경쟁 방지용 토큰
+var _LIGHT_TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 
-/* ─── Chart.js 다크 테마 기본값 ─── */
+/* ─── Chart.js 라이트 테마 기본값 ─── */
 if (typeof Chart !== 'undefined') {
-  Chart.defaults.color = '#98989D';
-  Chart.defaults.borderColor = 'rgba(84, 84, 88, 0.35)';
-  Chart.defaults.plugins.legend.labels.color = '#98989D';
+  Chart.defaults.color = '#4E5968';
+  Chart.defaults.borderColor = 'rgba(0, 0, 0, 0.06)';
+  Chart.defaults.plugins.legend.labels.color = '#4E5968';
 }
 
 /* ─── 대쉬보드 로드 ─── */
@@ -31,17 +32,23 @@ async function loadDashboard(date) {
     }
   }
 
-  // 해당 날짜 데이터 로드
-  var dayPhotos = await loadPhotosByDate(targetDate);
-  renderDayStats(dayPhotos);
+  try {
+    // 해당 날짜 데이터 로드
+    var dayPhotos = await loadPhotosByDate(targetDate);
+    renderDayStats(dayPhotos);
 
-  // 히스토리 필터 로드
-  await loadFilteredHistory(AppState.filterPeriod);
+    // 히스토리 필터 로드
+    await loadFilteredHistory(AppState.filterPeriod);
 
-  // 내 수집 목록 로드 (전체 사진)
-  var allPhotos = await loadUserPhotos();
-  AppState.photos = allPhotos;
-  renderCollectionGrid(allPhotos);
+    // 내 수집 목록 로드 (전체 사진)
+    var allPhotos = await loadUserPhotos();
+    AppState.photos = allPhotos;
+    renderCollectionGrid(allPhotos);
+  } catch (err) {
+    console.error('대쉬보드 로드 실패:', err);
+    var grid = document.getElementById('collection-grid');
+    if (grid) grid.innerHTML = '<div class="collection-empty">데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</div>';
+  }
 }
 
 /* ─── 일일 통계 렌더링 ─── */
@@ -83,7 +90,7 @@ var _CATEGORY_LABELS = {
 };
 var _CATEGORY_COLORS = {
   plastic: '#007AFF', vinyl: '#AF52DE', styrofoam: '#FF9500',
-  paper: '#D4956A', paperpack: '#34C759', glass: '#30B0C7',
+  paper: '#D4956A', paperpack: '#00A94F', glass: '#30B0C7',
   can: '#8E8E93', cigarette: '#FF3B30', other: '#636366',
   metal: '#8E8E93', organic: '#636366'
 };
@@ -113,10 +120,25 @@ function renderTrashTypeChart(photos) {
 
   if (_chartTrashType) _chartTrashType.destroy();
 
+  // 빈 상태 메시지는 형제 요소로 토글 — canvas 자체를 제거하면
+  // 이후 비어있지 않은 렌더가 detached 노드에 그려진다.
+  var parent = canvas.parentElement;
+  var emptyMsg = parent ? parent.querySelector('.chart-empty') : null;
+
   if (data.length === 0) {
-    canvas.parentElement.innerHTML = '<div class="chart-empty">데이터 없음</div>';
+    canvas.style.display = 'none';
+    if (parent && !emptyMsg) {
+      emptyMsg = document.createElement('div');
+      emptyMsg.className = 'chart-empty';
+      emptyMsg.textContent = '데이터 없음';
+      parent.appendChild(emptyMsg);
+    }
+    if (emptyMsg) emptyMsg.style.display = '';
     return;
   }
+
+  if (emptyMsg) emptyMsg.style.display = 'none';
+  canvas.style.display = '';
 
   _chartTrashType = new Chart(canvas, {
     type: 'doughnut',
@@ -147,6 +169,8 @@ function renderRouteMap(photos) {
   var mapEl = document.getElementById('route-map');
   if (!mapEl) return;
 
+  var token = ++_routeMapToken;  // 이 호출의 토큰
+
   var points = [];
   for (var i = 0; i < photos.length; i++) {
     if (photos[i].latitude && photos[i].longitude) {
@@ -158,15 +182,21 @@ function renderRouteMap(photos) {
     _routeMap.remove();
     _routeMap = null;
   }
+  // Leaflet 내부 참조 제거 — 컨테이너 재사용 시 "already initialized" 방지
+  delete mapEl._leaflet_id;
 
   if (points.length === 0) {
     mapEl.innerHTML = '';
     getCurrentLocation().then(function(loc) {
+      // 늦게 resolve된 콜백이 최신 렌더만 반영하도록 가드 (맵 중복 생성 방지)
+      if (token !== _routeMapToken) return;
       if (!loc.latitude || !loc.longitude) {
         mapEl.innerHTML = '<div class="chart-empty" style="height:100%;display:flex;align-items:center;justify-content:center">위치를 가져올 수 없습니다</div>';
         return;
       }
       if (_routeMap) { _routeMap.remove(); _routeMap = null; }
+      delete mapEl._leaflet_id;
+      mapEl.innerHTML = '';
       _routeMap = L.map(mapEl, {
         zoomControl: false,
         attributionControl: false,
@@ -175,10 +205,10 @@ function renderRouteMap(photos) {
         scrollWheelZoom: false,
         doubleClickZoom: false
       });
-      L.tileLayer(_DARK_TILE_URL, { maxZoom: 19 }).addTo(_routeMap);
+      L.tileLayer(_LIGHT_TILE_URL, { maxZoom: 19 }).addTo(_routeMap);
       _routeMap.setView([loc.latitude, loc.longitude], 15);
       var icon = L.divIcon({
-        html: '<span style="display:block;width:14px;height:14px;background:#007AFF;border-radius:50%;border:3px solid #fff;box-shadow:0 0 8px rgba(0,122,255,0.5)"></span>',
+        html: '<span style="display:block;width:14px;height:14px;background:#3182F6;border-radius:50%;border:3px solid #fff;box-shadow:0 0 8px rgba(49,130,246,0.45)"></span>',
         className: 'current-loc-marker',
         iconSize: [14, 14],
         iconAnchor: [7, 7]
@@ -195,10 +225,9 @@ function renderRouteMap(photos) {
     dragging: true,
     touchZoom: true,
     scrollWheelZoom: true,
-    doubleClickZoom: true,
-    pinchZoom: true
+    doubleClickZoom: true
   });
-  L.tileLayer(_DARK_TILE_URL, { maxZoom: 19 }).addTo(_routeMap);
+  L.tileLayer(_LIGHT_TILE_URL, { maxZoom: 19 }).addTo(_routeMap);
 
   /* ─── 줌 컨트롤 UI (오른쪽) ─── */
   var zoomWrap = document.createElement('div');
@@ -229,14 +258,14 @@ function renderRouteMap(photos) {
 
   // 경로 선
   if (points.length > 1) {
-    L.polyline(points, { color: '#34C759', weight: 3, opacity: 0.85 }).addTo(_routeMap);
+    L.polyline(points, { color: '#00A94F', weight: 3, opacity: 0.85 }).addTo(_routeMap);
   }
 
   // 쓰레기 마커
   for (var j = 0; j < photos.length; j++) {
     if (photos[j].latitude && photos[j].longitude) {
       var icon = L.divIcon({
-        html: '<span style="display:block;width:10px;height:10px;background:#34C759;border-radius:50%;border:2px solid rgba(0,0,0,0.3);box-shadow:0 0 6px rgba(52,199,89,0.5)"></span>',
+        html: '<span style="display:block;width:10px;height:10px;background:#00A94F;border-radius:50%;border:2px solid #fff;box-shadow:0 0 6px rgba(0,169,79,0.45)"></span>',
         className: 'trash-marker',
         iconSize: [10, 10],
         iconAnchor: [5, 5]
@@ -245,7 +274,12 @@ function renderRouteMap(photos) {
     }
   }
 
-  _routeMap.fitBounds(points, { padding: [20, 20] });
+  // 포인트 1개면 fitBounds가 zero-area로 과도 확대 → setView로 처리
+  if (points.length === 1) {
+    _routeMap.setView(points[0], 16);
+  } else {
+    _routeMap.fitBounds(points, { padding: [20, 20] });
+  }
 }
 
 /* ─── GPS 포인트 간 거리 계산 (km) ─── */

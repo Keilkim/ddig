@@ -71,10 +71,10 @@ function renderHistoryTrendChart(photos) {
   var canvas = document.getElementById('chart-history-trend');
   if (!canvas) return;
 
-  // 날짜별 그룹핑
+  // 날짜별 그룹핑 (로컬 기준)
   var dailyCounts = {};
   for (var i = 0; i < photos.length; i++) {
-    var day = photos[i].captured_at.substring(0, 10);
+    var day = localDayKey(photos[i].captured_at);
     dailyCounts[day] = (dailyCounts[day] || 0) + 1;
   }
 
@@ -96,8 +96,8 @@ function renderHistoryTrendChart(photos) {
       labels: labels,
       datasets: [{
         data: data,
-        borderColor: '#4A90D9',
-        backgroundColor: 'rgba(74, 144, 217, 0.1)',
+        borderColor: '#3182F6',
+        backgroundColor: 'rgba(49, 130, 246, 0.1)',
         fill: true,
         tension: 0.4,
         pointRadius: 3

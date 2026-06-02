@@ -1,0 +1,28 @@
+{
+  "_comment": "생성할 아이콘 목록. name 은 파일명(assets/icons/<name>.png)이 되고, prompt(Subject)는 config.json 의 stylePrompt 뒤에 이어 붙습니다. 이 name 들은 js/html/icons.js 의 iconImg()/카테고리 매핑이 그대로 참조하므로 함부로 바꾸지 마세요. 새 아이콘이 필요하면 items 에 객체를 추가하고, 앱에서도 iconImg('<name>') 로 연결하세요.",
+
+  "items": [
+    { "name": "trophy",   "prompt": "a winner's trophy cup with two handles on a small base" },
+    { "name": "pin",      "prompt": "a teardrop-shaped map location pin marker with a small circle hole in the center" },
+    { "name": "user",     "prompt": "a simple person avatar, a round head above rounded shoulders, front view" },
+    { "name": "camera",   "prompt": "a compact photo camera, front view, with a round lens" },
+    { "name": "warning",  "prompt": "a rounded warning triangle sign with an exclamation mark in the center" },
+
+    { "name": "medal-gold",   "prompt": "a round sports medal hanging from a folded neck ribbon, with the numeral 1 engraved in the center" },
+    { "name": "medal-silver", "prompt": "a round sports medal hanging from a folded neck ribbon, with the numeral 2 engraved in the center" },
+    { "name": "medal-bronze", "prompt": "a round sports medal hanging from a folded neck ribbon, with the numeral 3 engraved in the center" },
+
+    { "name": "tab-activity", "prompt": "a trail of two walking shoe footprints, representing an outdoor walking activity" },
+    { "name": "tab-ranking",  "prompt": "a three-step winners podium ranking stand, the tallest step in the middle" },
+
+    { "name": "cat-plastic",   "prompt": "a clear plastic PET drink bottle with a cap" },
+    { "name": "cat-vinyl",     "prompt": "a crumpled plastic shopping bag with handles" },
+    { "name": "cat-styrofoam", "prompt": "a styrofoam foam food takeout container box" },
+    { "name": "cat-paper",     "prompt": "a small stack of folded paper sheets" },
+    { "name": "cat-paperpack", "prompt": "a paper drink carton, like a milk or juice gable-top carton" },
+    { "name": "cat-glass",     "prompt": "a glass beverage bottle with a narrow neck" },
+    { "name": "cat-can",       "prompt": "an aluminum beverage can with a pull tab" },
+    { "name": "cat-cigarette", "prompt": "a single discarded cigarette butt" },
+    { "name": "cat-other",     "prompt": "a waste bin trash can with a lid" }
+  ]
+}

@@ -4,6 +4,25 @@
    Supabase DB CRUD 모듈
    ════════════════════════════════════════ */
 
+/* ─── 전체 행 페이지네이션 조회 ───
+   PostgREST/Supabase는 기본 1000행 캡이 있어 .range()로 끝까지 반복
+   조회하지 않으면 집계·경로가 조용히 잘린다. buildQuery는 매번 새
+   쿼리 빌더를 반환해야 한다(빌더는 1회용). */
+async function fetchAllRows(buildQuery) {
+  var PAGE = 1000;
+  var all = [];
+  var offset = 0;
+  while (true) {
+    var result = await buildQuery().range(offset, offset + PAGE - 1);
+    if (result.error) return { data: all, error: result.error };
+    var rows = result.data || [];
+    all = all.concat(rows);
+    if (rows.length < PAGE) break;
+    offset += PAGE;
+  }
+  return { data: all, error: null };
+}
+
 /* ─── 사진 메타데이터 저장 ─── */
 async function savePhotoMeta(data) {
   if (!supabaseClient || !AppState.user) return null;
@@ -56,11 +75,13 @@ async function updatePhotoAnalysis(photoId, analysis) {
 async function loadUserPhotos() {
   if (!supabaseClient || !AppState.user) return [];
 
-  var result = await supabaseClient
-    .from('photos')
-    .select('*')
-    .eq('user_id', AppState.user.id)
-    .order('captured_at', { ascending: false });
+  var result = await fetchAllRows(function() {
+    return supabaseClient
+      .from('photos')
+      .select('*')
+      .eq('user_id', AppState.user.id)
+      .order('captured_at', { ascending: false });
+  });
 
   if (result.error) {
     console.error('사진 로드 실패:', result.error);
@@ -126,24 +147,28 @@ async function loadPhotosByPeriod(periodKey) {
     default: from.setMonth(now.getMonth() - 1);
   }
 
-  var result = await supabaseClient
-    .from('photos')
-    .select('*')
-    .eq('user_id', AppState.user.id)
-    .gte('captured_at', from.toISOString())
-    .order('captured_at', { ascending: true });
+  var result = await fetchAllRows(function() {
+    return supabaseClient
+      .from('photos')
+      .select('*')
+      .eq('user_id', AppState.user.id)
+      .gte('captured_at', from.toISOString())
+      .order('captured_at', { ascending: true });
+  });
 
   return result.data || [];
 }
 
 /* ─── 랭킹 데이터 조회 (직접 쿼리) ─── */
-async function loadRankingData(scope) {
+async function loadRankingData() {
   if (!supabaseClient) return [];
 
-  // 모든 유저의 사진 데이터 조회
-  var result = await supabaseClient
-    .from('photos')
-    .select('user_id, trash_category, pollution_impact, district_code');
+  // 모든 유저의 사진 데이터 조회 (전체 페이지) — 비민감 컬럼만 노출하는 공개 뷰
+  var result = await fetchAllRows(function() {
+    return supabaseClient
+      .from('photos_public')
+      .select('user_id, trash_category, pollution_impact, district_code');
+  });
 
   if (result.error) {
     console.error('랭킹 로드 실패:', result.error);
@@ -167,8 +192,10 @@ async function loadRankingData(scope) {
     }
   }
 
-  // 프로필 정보 조회
-  var profiles = await supabaseClient.from('profiles').select('id, display_name, avatar_url');
+  // 프로필 정보 조회 (전체 페이지)
+  var profiles = await fetchAllRows(function() {
+    return supabaseClient.from('profiles').select('id, display_name, avatar_url, affiliation');
+  });
   var profMap = {};
   if (profiles.data) {
     for (var j = 0; j < profiles.data.length; j++) {
@@ -194,6 +221,7 @@ async function loadRankingData(scope) {
       user_id: uid,
       display_name: prof.display_name || '익명',
       avatar_url: prof.avatar_url || '',
+      affiliation: prof.affiliation || '',
       trash_count: data.trash_count,
       total_impact: data.total_impact,
       top_district: topDist
@@ -201,7 +229,6 @@ async function loadRankingData(scope) {
   }
 
   ranking.sort(function(a, b) { return b.trash_count - a.trash_count; });
-  console.log('[loadRankingData] 유저 수:', ranking.length);
   return ranking;
 }
 
@@ -209,15 +236,16 @@ async function loadRankingData(scope) {
 async function loadUserRoutes(userId) {
   if (!supabaseClient) return [];
 
-  var result = await supabaseClient
-    .from('photos')
-    .select('latitude, longitude, district_code, captured_at')
-    .eq('user_id', userId)
-    .not('latitude', 'is', null)
-    .not('longitude', 'is', null)
-    .order('captured_at', { ascending: true });
+  var result = await fetchAllRows(function() {
+    return supabaseClient
+      .from('photos_public')
+      .select('latitude, longitude, district_code, captured_at')
+      .eq('user_id', userId)
+      .not('latitude', 'is', null)
+      .not('longitude', 'is', null)
+      .order('captured_at', { ascending: true });
+  });
 
-  console.log('[loadUserRoutes]', userId, '→', result.data ? result.data.length : 0, '건', result.error || '');
   if (result.error) {
     console.error('경로 로드 실패:', result.error);
     return [];
@@ -229,11 +257,13 @@ async function loadUserRoutes(userId) {
 async function loadUserDistrictStats(userId) {
   if (!supabaseClient) return [];
 
-  var result = await supabaseClient
-    .from('photos')
-    .select('district_code')
-    .eq('user_id', userId)
-    .not('district_code', 'is', null);
+  var result = await fetchAllRows(function() {
+    return supabaseClient
+      .from('photos_public')
+      .select('district_code')
+      .eq('user_id', userId)
+      .not('district_code', 'is', null);
+  });
 
   if (result.error) {
     console.error('시군구 통계 로드 실패:', result.error);
@@ -256,19 +286,23 @@ async function loadUserDistrictStats(userId) {
   return stats;
 }
 
-/* ─── 기존 사진 district_code 백필 (1회) ─── */
+/* ─── 기존 사진 district_code 백필 (세션 1회) ─── */
+var _districtBackfillDone = false;
 async function backfillDistrictCodes() {
   if (!supabaseClient || !AppState.user) return;
   if (!_districtGeoJSON) return;
+  if (_districtBackfillDone) return;  // 매 탭 진입마다 재실행 방지
 
-  var result = await supabaseClient
-    .from('photos')
-    .select('id, latitude, longitude')
-    .eq('user_id', AppState.user.id)
-    .is('district_code', null)
-    .not('latitude', 'is', null);
+  var result = await fetchAllRows(function() {
+    return supabaseClient
+      .from('photos')
+      .select('id, latitude, longitude')
+      .eq('user_id', AppState.user.id)
+      .is('district_code', null)
+      .not('latitude', 'is', null);
+  });
 
-  if (!result.data || result.data.length === 0) return;
+  if (!result.data || result.data.length === 0) { _districtBackfillDone = true; return; }
 
   for (var i = 0; i < result.data.length; i++) {
     var photo = result.data[i];
@@ -280,6 +314,7 @@ async function backfillDistrictCodes() {
         .eq('id', photo.id);
     }
   }
+  _districtBackfillDone = true;
 }
 
 /* ─── 월별 활동 요약 (캘린더용) ─── */
@@ -289,19 +324,21 @@ async function loadMonthlyActivity(year, month) {
   var from = new Date(year, month, 1);
   var to = new Date(year, month + 1, 0, 23, 59, 59);
 
-  var result = await supabaseClient
-    .from('photos')
-    .select('captured_at, latitude, longitude')
-    .eq('user_id', AppState.user.id)
-    .gte('captured_at', from.toISOString())
-    .lte('captured_at', to.toISOString());
+  var result = await fetchAllRows(function() {
+    return supabaseClient
+      .from('photos')
+      .select('captured_at, latitude, longitude')
+      .eq('user_id', AppState.user.id)
+      .gte('captured_at', from.toISOString())
+      .lte('captured_at', to.toISOString());
+  });
 
   if (!result.data) return {};
 
-  // 날짜별 그룹핑
+  // 날짜별 그룹핑 (로컬 기준 — 캘린더 셀과 일치)
   var activity = {};
   for (var i = 0; i < result.data.length; i++) {
-    var dayKey = result.data[i].captured_at.substring(0, 10);
+    var dayKey = localDayKey(result.data[i].captured_at);
     if (!activity[dayKey]) activity[dayKey] = { count: 0 };
     activity[dayKey].count++;
   }

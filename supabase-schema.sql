@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id           UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   display_name TEXT,
   avatar_url   TEXT,
+  affiliation  TEXT,           -- 소속(팀/단체) — 간편가입 & 랭킹 표시용
+  phone_last4  TEXT,           -- 핸드폰 뒤 4자리 — 간편가입 구분/복구 키
   auto_login   BOOLEAN DEFAULT false,
   created_at   TIMESTAMPTZ DEFAULT now()
 );
@@ -73,11 +75,17 @@ CREATE POLICY "photos_delete_own" ON public.photos
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, display_name, avatar_url)
+  -- 구글 OAuth & 간편가입(이름·소속·4자리) 모두 처리
+  INSERT INTO public.profiles (id, display_name, avatar_url, affiliation, phone_last4)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'avatar_url', NEW.raw_user_meta_data->>'picture', '')
+    COALESCE(NEW.raw_user_meta_data->>'display_name',
+             NEW.raw_user_meta_data->>'full_name',
+             NEW.raw_user_meta_data->>'name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'avatar_url',
+             NEW.raw_user_meta_data->>'picture', ''),
+    NEW.raw_user_meta_data->>'affiliation',
+    NEW.raw_user_meta_data->>'phone_last4'
   );
   RETURN NEW;
 END;
@@ -99,17 +107,23 @@ CREATE TRIGGER on_auth_user_created
 -- DELETE policy: (bucket_id = 'photos') AND (auth.uid()::text = (storage.foldername(name))[1])
 
 -- ============================================================
--- STEP 5.5: 다른 유저 위치 데이터 조회 허용 (랭킹용)
+-- STEP 5.5: photos 조회 정책 — 본인 데이터만 (민감 컬럼 보호)
 -- ============================================================
+--
+-- ⚠️ 과거 "photos_select_location_all" 정책(auth.uid() IS NOT NULL)은
+--    RLS가 row-level이라 컬럼을 가리지 못해, 로그인한 누구나 타인의
+--    storage_path / gemini_raw / 정확한 GPS 전체 행을 SELECT할 수 있었다.
+--    → 해당 정책을 제거하고 본인 전용 SELECT로 되돌린다.
+--    타 유저의 "비민감" 정보(위치/카테고리/시군구)는 STEP 7의
+--    photos_public 뷰를 통해서만 노출한다(민감 컬럼은 뷰에서 제외).
 
--- 인증된 모든 유저가 다른 유저의 위치/카테고리 정보 조회 가능
--- (storage_path, gemini_raw 등 민감 데이터는 RLS 기본 정책으로 차단)
-CREATE POLICY "photos_select_location_all" ON public.photos
-  FOR SELECT
-  USING (auth.uid() IS NOT NULL);
+-- 과거의 과도하게 넓은 정책 제거
+DROP POLICY IF EXISTS "photos_select_location_all" ON public.photos;
 
--- 기존 본인 전용 정책 제거 후 위 정책으로 대체
+-- 본인 데이터만 직접 조회 가능하도록 복구
 DROP POLICY IF EXISTS "photos_select_own" ON public.photos;
+CREATE POLICY "photos_select_own" ON public.photos
+  FOR SELECT USING (auth.uid() = user_id);
 
 -- ============================================================
 -- STEP 6: 랭킹 시스템 — district_code 컬럼 & RPC 함수
@@ -118,6 +132,10 @@ DROP POLICY IF EXISTS "photos_select_own" ON public.photos;
 -- 시/군/구 코드 컬럼 추가
 ALTER TABLE public.photos ADD COLUMN IF NOT EXISTS district_code TEXT;
 CREATE INDEX IF NOT EXISTS idx_photos_district ON public.photos (district_code);
+
+-- 간편가입(이름·소속·4자리)용 프로필 컬럼 — 이미 배포된 DB 대비 idempotent 추가
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS affiliation TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone_last4 TEXT;
 
 -- 랭킹 데이터 조회 (SECURITY DEFINER — RLS 우회하여 집계 데이터만 반환)
 CREATE OR REPLACE FUNCTION public.get_ranking(rank_scope TEXT DEFAULT 'national')
@@ -181,6 +199,39 @@ BEGIN
   ORDER BY COUNT(*) DESC;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================
+-- STEP 7: 공개 뷰 — 타 유저의 비민감 정보만 노출 (랭킹/경로 비교용)
+-- ============================================================
+--
+-- 직접 쿼리 방식을 유지하면서 컬럼 노출만 차단한다.
+-- ⚠️ 이 뷰는 반드시 security_invoker=false(기본값)로 유지해야 한다.
+--    소유자(postgres) 권한으로 실행되어 photos의 RLS를 우회하므로
+--    모든 유저의 행이 보이되, SELECT 목록에 없는 storage_path /
+--    gemini_raw 는 애초에 노출되지 않는다. (위치/경로는 "다른 유저 경로
+--    비교" 기능의 핵심이라 의도적으로 포함)
+--    security_invoker=true 로 바꾸면 본인 행만 보여 랭킹/비교가 깨진다.
+--    (WITH 절을 생략한 이유: PG15 미만 호환 — false가 기본 동작)
+
+DROP VIEW IF EXISTS public.photos_public;
+CREATE VIEW public.photos_public AS
+  SELECT
+    id,
+    user_id,
+    latitude,
+    longitude,
+    trash_category,
+    pollution_impact,
+    district_code,
+    captured_at
+  FROM public.photos;
+
+-- 인증된 유저만 공개 뷰 조회 가능 (storage_path/gemini_raw 컬럼은 뷰에 없음)
+REVOKE ALL ON public.photos_public FROM anon;
+GRANT SELECT ON public.photos_public TO authenticated;
+
+-- PostgREST 스키마 캐시 갱신
+NOTIFY pgrst, 'reload schema';
 
 -- ============================================================
 -- 완료!

@@ -1,0 +1,29 @@
+{
+  "_comment": "전역 생성 설정. icons.json 의 각 항목에서 size/quality/background/model 을 개별 덮어쓸 수 있습니다.",
+
+  "model": "gpt-image-1",
+  "_model_note": "투명 배경 PNG가 필요해서 gpt-image-1 을 사용합니다. (gpt-image-2 는 투명 미지원이라 흰 배경+수동 누끼가 필요 → 손그림 투명 아이콘에는 부적합). 계정에서 gpt-image-1 이 막혀 있으면 model 을 gpt-image-2 로 바꾸고 background 를 opaque 로 둔 뒤, 생성물의 흰 배경을 직접 따내 assets/icons 로 옮기세요.",
+
+  "size": "1024x1024",
+  "_size_options": ["1024x1024", "1536x1024", "1024x1536", "auto"],
+  "_size_note": "표시 크기는 16~72px이라 1024 면 충분. 배포 전 256px 내외로 다운스케일 권장(README 참고).",
+
+  "quality": "high",
+  "_quality_options": ["low", "medium", "high", "auto"],
+
+  "background": "transparent",
+  "_background_options": ["transparent", "opaque", "auto"],
+  "_background_note": "검은 펜 아이콘을 다양한 배경(카메라 검은 화면/밝은 패널) 위에 올리므로 투명 배경이 필요합니다. CSS(js/html/icons.js + base.css)에서 밝은 종이 타일 위에 표시합니다.",
+
+  "output_format": "png",
+  "_output_format_options": ["png", "webp"],
+
+  "outputDir": "../assets/icons",
+  "_outputDir_note": "앱이 직접 참조하는 배포 경로(assets/icons/<name>.png). icon-gen/output 이 아니라 여기로 바로 떨어집니다. js/html/icons.js 의 iconImg() 가 이 파일명들을 사용합니다.",
+
+  "concurrency": 3,
+  "_concurrency_note": "동시에 호출할 이미지 개수. 너무 크면 429(레이트리밋) 발생.",
+
+  "stylePrompt": "A single minimalist icon. Hand-drawn black ink pen illustration, as if drawn with one black pen on white paper. Clean OUTLINE style with smooth ROUNDED corners and no sharp angles. Variable line weight: thick bold outer contour, thin delicate inner lines. Interior shaded with fine diagonal HATCHING lines, never solid fill. Flat 2D, no shadow, no gradient, no color — pure black ink only. One single object, centered with generous padding. Transparent background. Square 1:1 composition. No text or letters except where explicitly part of the subject.",
+  "_stylePrompt_note": "모든 아이콘 프롬프트 앞에 자동으로 붙는 공통 톤(검은 펜 손그림·라운드 코너·외곽 굵게·빗금 채움·투명 배경). 톤을 바꾸려면 이 한 줄만 수정하세요. 각 항목의 prompt 는 '무엇을' 그릴지(Subject)만 적습니다."
+}

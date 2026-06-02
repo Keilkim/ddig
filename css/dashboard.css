@@ -9,13 +9,13 @@
 
 #view-dashboard .title-bar {
   background: var(--color-glass-dark);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 0.5px solid var(--color-separator);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-separator);
 }
 
 #view-dashboard .title-bar-text {
-  color: #fff;
+  color: var(--color-label);
 }
 
 /* 대쉬보드 컨텐츠 — 내부 스크롤 */
@@ -84,9 +84,9 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  background: rgba(44,44,46,0.92);
+  background: rgba(255,255,255,0.95);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   padding: 4px;
 }
 .zoom-btn {
@@ -96,7 +96,7 @@
   background: transparent;
   font-size: 20px;
   font-weight: 600;
-  color: #fff;
+  color: var(--color-label);
   cursor: pointer;
   border-radius: 8px;
   display: flex;
@@ -106,7 +106,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 .zoom-btn:active {
-  background: rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.05);
 }
 .zoom-level {
   font-size: 12px;
@@ -115,8 +115,8 @@
   min-width: 34px;
   text-align: center;
   padding: 2px 0;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
 .distance-display {
@@ -295,15 +295,20 @@
 .dashboard-tabs {
   display: flex;
   flex-shrink: 0;
-  border-bottom: 0.5px solid var(--color-separator);
+  border-bottom: 1px solid var(--color-separator);
   background: var(--color-glass-dark);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .dashboard-tab {
   flex: 1;
-  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 0;
   text-align: center;
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -313,6 +318,20 @@
   border-bottom: 2px solid transparent;
   transition: color 0.2s, border-color 0.2s;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* 대시보드 탭 아이콘 (손그림) */
+.dashboard-tab-icon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+.dashboard-tab-active .dashboard-tab-icon {
+  opacity: 1;
+}
+.dashboard-tab-label {
+  display: block;
 }
 
 .dashboard-tab-active {
@@ -366,6 +385,21 @@
   font-size: var(--font-size-sm);
 }
 
+/* 빈 상태 손그림 아이콘 (트로피/핀/유저/경고) */
+.ranking-empty-icon {
+  margin-bottom: 12px;
+  font-size: 40px;   /* 이모지 폴백 크기 */
+  line-height: 1;
+}
+.ranking-empty-icon-img {
+  width: 64px;
+  height: 64px;
+  padding: 10px;
+  background: var(--color-paper);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+}
+
 /* 랭킹 스피너 */
 .ranking-spinner {
   width: 28px;
@@ -398,7 +432,7 @@
   background: var(--color-fill);
 }
 .ranking-item-self {
-  background: rgba(52, 199, 89, 0.06);
+  background: rgba(0, 169, 79, 0.08);
 }
 
 .ranking-position {
@@ -408,6 +442,12 @@
   font-weight: 700;
   color: var(--color-secondary);
   flex-shrink: 0;
+}
+
+/* 랭킹 메달 아이콘 (1·2·3위) */
+.ranking-medal {
+  width: 26px;
+  height: 26px;
 }
 
 .ranking-avatar {
@@ -423,6 +463,10 @@
   align-items: center;
   justify-content: center;
   font-size: 20px;
+}
+.ranking-avatar-img {
+  width: 24px;
+  height: 24px;
 }
 
 .ranking-info {
@@ -449,6 +493,15 @@
   font-weight: 600;
   vertical-align: middle;
   margin-left: 4px;
+}
+
+.ranking-affiliation {
+  font-size: var(--font-size-xs);
+  color: var(--color-secondary);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ranking-district {
@@ -486,14 +539,14 @@
 /* 대쉬보드 하단 탭바 */
 #view-dashboard .btn-group {
   background: var(--color-glass-dark);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 0.5px solid var(--color-separator);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--color-separator);
   flex-shrink: 0;
 }
 
 #view-dashboard .btn-group-item {
-  color: rgba(255,255,255,0.85);
+  color: var(--color-secondary);
 }
 
 #view-dashboard .btn-group-item:active {

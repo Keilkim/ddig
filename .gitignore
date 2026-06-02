@@ -5,3 +5,11 @@ node_modules/
 Thumbs.db
 supabase-config.js
 apikey.js
+
+# 테스트 전용 — 푸시 제외
+test-account.html
+
+# 아이콘 생성 도구 — API 키 / 생성 결과물 제외
+icon-gen/.env
+icon-gen/output/
+icon-gen/.env.local

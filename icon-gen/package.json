@@ -1,0 +1,16 @@
+{
+  "name": "digg-icon-gen",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "DIGG X GONGSIM — OpenAI 이미지 API로 픽토그램/아이콘 일괄 생성 (로컬 전용, 배포 대상 아님)",
+  "scripts": {
+    "gen": "node generate.mjs",
+    "gen:force": "node generate.mjs --force",
+    "list": "node generate.mjs --list",
+    "dry": "node generate.mjs --dry"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

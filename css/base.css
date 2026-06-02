@@ -3,10 +3,10 @@
    깔끔, 미니멀, 한 화면 고정
    ======================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
 
 :root {
-  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-primary: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', 'Segoe UI', Roboto, sans-serif;
   --font-size-xs: 11px;
   --font-size-sm: 13px;
   --font-size-md: 15px;
@@ -15,25 +15,27 @@
   --font-size-2xl: 28px;
   --font-size-3xl: 34px;
 
-  --color-bg: #000000;
-  --color-white: #1C1C1E;
-  --color-label: #FFFFFF;
-  --color-secondary: #98989D;
-  --color-tertiary: #636366;
-  --color-separator: rgba(84, 84, 88, 0.35);
-  --color-fill: rgba(120, 120, 128, 0.24);
+  --color-bg: #F2F4F6;
+  --color-white: #FFFFFF;
+  --color-label: #191F28;
+  --color-secondary: #4E5968;
+  --color-tertiary: #8B95A1;
+  --color-separator: #E5E8EB;
+  --color-fill: #F2F4F6;
+  --color-paper: #FAF6EC;
 
-  --color-green: #34C759;
-  --color-green-light: rgba(52, 199, 89, 0.18);
-  --color-blue: #007AFF;
+  --color-green: #00A94F;
+  --color-green-light: rgba(0, 169, 79, 0.10);
+  --color-green-dark: #00873F;
+  --color-blue: #3182F6;
   --color-red: #FF3B30;
   --color-orange: #FF9500;
   --color-teal: #5AC8FA;
   --color-mint: #00C7BE;
 
-  --color-overlay: rgba(0, 0, 0, 0.6);
-  --color-glass: rgba(28, 28, 30, 0.72);
-  --color-glass-dark: rgba(28, 28, 30, 0.72);
+  --color-overlay: rgba(0, 0, 0, 0.45);
+  --color-glass: rgba(255, 255, 255, 0.85);
+  --color-glass-dark: rgba(255, 255, 255, 0.85);
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -47,9 +49,9 @@
   --space-lg: 20px;
   --space-xl: 24px;
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md: 0 2px 10px rgba(0,0,0,0.3);
-  --shadow-lg: 0 8px 30px rgba(0,0,0,0.4);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.10);
 }
 
 *, *::before, *::after {
@@ -70,7 +72,7 @@ body {
   font-family: var(--font-primary);
   font-weight: 400;
   color: var(--color-label);
-  background: #000;
+  background: var(--color-bg);
   line-height: 1.47;
   -webkit-font-smoothing: antialiased;
 }
@@ -119,12 +121,12 @@ button:active, .btn:active {
   z-index: 1000;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 .popup-overlay.active { display: flex; }
 .popup-content {
-  background: #2C2C2E;
+  background: var(--color-white);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
   max-width: 90vw;
@@ -142,3 +144,28 @@ button:active, .btn:active {
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ========================================
+   손그림 아이콘 (assets/icons/*.png)
+   검은 잉크 → 밝은 타일 위에 표시. 에셋이 없으면 이모지로 폴백.
+   생성: icon-gen (node icon-gen/generate.mjs) · 헬퍼: js/html/icons.js
+   ======================================== */
+.app-icon {
+  display: inline-block;
+  object-fit: contain;
+  vertical-align: middle;
+}
+.app-icon-fallback {
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+/* 카테고리 아이콘 — 배지/라벨용 소형, 밝은 타일로 대비 확보 */
+.category-icon {
+  width: 16px;
+  height: 16px;
+  padding: 2px;
+  background: var(--color-white);
+  border-radius: var(--radius-sm);
+}

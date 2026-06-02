@@ -99,6 +99,21 @@ var _CLASSIFY_RULES = [
   }
 ];
 
+/* ─── 카테고리별 오염도(저감) 가중치 ───
+   쓰레기 1점당 환경 오염 기여도. 자연 분해가 어렵거나 유해물질이
+   많은 항목일수록 높다(담배꽁초·스티로폼·플라스틱). */
+var _POLLUTION_WEIGHTS = {
+  cigarette: 8, styrofoam: 7, plastic: 6, vinyl: 5,
+  glass: 4, can: 3, paper: 2, paperpack: 2, other: 3
+};
+
+/* ─── 카테고리 → 오염도 점수 ─── */
+function computePollutionImpact(category) {
+  if (!category || category === 'none') return 0;
+  var w = _POLLUTION_WEIGHTS[category];
+  return (typeof w === 'number') ? w : _POLLUTION_WEIGHTS.other;
+}
+
 /* ─── 키워드 매칭으로 카테고리 결정 ─── */
 function classifyByKeywords(text) {
   if (!text) return null;
@@ -232,8 +247,14 @@ async function analyzePhoto(base64Image) {
     }
 
     var result = await response.json();
+    // 안전 차단/쿼터 등으로 candidates가 비어 올 수 있음 → 가드
+    if (!result.candidates || !result.candidates[0] ||
+        !result.candidates[0].content || !result.candidates[0].content.parts ||
+        !result.candidates[0].content.parts[0]) {
+      console.error('Gemini 응답에 candidates 없음:', result.promptFeedback || result);
+      return null;
+    }
     var text = result.candidates[0].content.parts[0].text;
-    console.log('[Gemini 원본 응답]', text);
 
     var jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return null;
@@ -246,7 +267,6 @@ async function analyzePhoto(base64Image) {
       for (var i = 0; i < parsed.objects.length; i++) {
         var obj = parsed.objects[i];
         var bbox = obj.bbox;
-        console.log('[Gemini bbox 원본]', obj.label, bbox);
         if (bbox && bbox.length >= 4) {
           if (bbox[0] === 0 && bbox[1] === 0 && bbox[2] === 0 && bbox[3] === 0) continue;
           objects.push({
@@ -263,14 +283,13 @@ async function analyzePhoto(base64Image) {
         }
       }
     }
-    console.log('[변환된 objects]', JSON.stringify(objects));
-
     var category = correctCategory(parsed);
-    console.log('[카테고리 보정]', parsed.trash_category, '->', category);
+    var finalCategory = parsed.is_trash === false ? 'none' : category;
 
     return {
       is_trash: parsed.is_trash !== false,
-      trash_category: parsed.is_trash === false ? 'none' : category,
+      trash_category: finalCategory,
+      pollution_impact: computePollutionImpact(finalCategory),
       description: parsed.description || '',
       objects: objects
     };

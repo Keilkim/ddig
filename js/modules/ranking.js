@@ -61,16 +61,27 @@ async function loadRanking(rankType) {
 
   // 데이터 로드 (캐시 활용)
   if (!_rankingCache) {
-    var data = await loadRankingData('national');
-    _rankingCache = data;
-    AppState.rankingData = data;
+    try {
+      var data = await loadRankingData();
+      _rankingCache = data;
+      AppState.rankingData = data;
+    } catch (err) {
+      console.error('랭킹 로드 실패:', err);
+      content.innerHTML =
+        '<div class="ranking-empty">' +
+          '<div class="ranking-empty-icon">' + iconImg('warning', { cls: 'ranking-empty-icon-img', fallback: '⚠️' }) + '</div>' +
+          '<div>랭킹을 불러오지 못했습니다</div>' +
+          '<div style="margin-top:8px;font-size:12px;color:var(--color-tertiary)">잠시 후 다시 시도해주세요</div>' +
+        '</div>';
+      return;
+    }
   }
 
   var allUsers = _rankingCache;
   if (!allUsers || allUsers.length === 0) {
     content.innerHTML =
       '<div class="ranking-empty">' +
-        '<div style="font-size:40px;margin-bottom:12px">🏆</div>' +
+        '<div class="ranking-empty-icon">' + iconImg('trophy', { cls: 'ranking-empty-icon-img', fallback: '🏆' }) + '</div>' +
         '<div>아직 랭킹 데이터가 없습니다</div>' +
         '<div style="margin-top:8px;font-size:12px;color:var(--color-tertiary)">플로깅을 시작해보세요!</div>' +
       '</div>';
@@ -85,6 +96,7 @@ async function loadRanking(rankType) {
       user_id: u.user_id,
       display_name: u.display_name || '익명',
       avatar_url: u.avatar_url || '',
+      affiliation: u.affiliation || '',
       trash_count: Number(u.trash_count) || 0,
       total_impact: Number(u.total_impact) || 0,
       top_district: u.top_district || '',
@@ -134,7 +146,7 @@ async function loadRanking(rankType) {
   if (filtered.length === 0) {
     content.innerHTML =
       '<div class="ranking-empty">' +
-        '<div style="font-size:40px;margin-bottom:12px">📍</div>' +
+        '<div class="ranking-empty-icon">' + iconImg('pin', { cls: 'ranking-empty-icon-img', fallback: '📍' }) + '</div>' +
         '<div>내 동네 랭킹이 없습니다</div>' +
         '<div style="margin-top:8px;font-size:12px;color:var(--color-tertiary)">플로깅 기록이 쌓이면 동네 랭킹이 표시됩니다</div>' +
       '</div>';
@@ -147,21 +159,22 @@ async function loadRanking(rankType) {
     var isSelf = user.user_id === myId;
     var pos = r + 1;
     var medal = '';
-    if (pos === 1) medal = '🥇';
-    else if (pos === 2) medal = '🥈';
-    else if (pos === 3) medal = '🥉';
+    if (pos === 1) medal = iconImg('medal-gold', { cls: 'ranking-medal', fallback: '🥇' });
+    else if (pos === 2) medal = iconImg('medal-silver', { cls: 'ranking-medal', fallback: '🥈' });
+    else if (pos === 3) medal = iconImg('medal-bronze', { cls: 'ranking-medal', fallback: '🥉' });
 
     var districtLabel = user.top_district ? getDistrictShortName(user.top_district) : '';
     var avatarHtml = user.avatar_url
-      ? '<img src="' + user.avatar_url + '" alt="" class="ranking-avatar">'
-      : '<div class="ranking-avatar ranking-avatar-default">👤</div>';
+      ? '<img src="' + escapeHtml(user.avatar_url) + '" alt="" class="ranking-avatar">'
+      : '<div class="ranking-avatar ranking-avatar-default">' + iconImg('user', { cls: 'ranking-avatar-img', fallback: '👤' }) + '</div>';
 
     html +=
-      '<div class="ranking-item' + (isSelf ? ' ranking-item-self' : '') + '" onclick="openComparisonMap(\'' + user.user_id + '\', \'' + (user.display_name || '').replace(/'/g, "\\'") + '\')">' +
+      '<div class="ranking-item' + (isSelf ? ' ranking-item-self' : '') + '" onclick="openComparisonMap(\'' + escapeJsAttr(user.user_id) + '\', \'' + escapeJsAttr(user.display_name) + '\')">' +
         '<div class="ranking-position">' + (medal || pos) + '</div>' +
         avatarHtml +
         '<div class="ranking-info">' +
-          '<div class="ranking-name">' + user.display_name + (isSelf ? ' <span class="ranking-me-badge">나</span>' : '') + '</div>' +
+          '<div class="ranking-name">' + escapeHtml(user.display_name) + (isSelf ? ' <span class="ranking-me-badge">나</span>' : '') + '</div>' +
+          (user.affiliation ? '<div class="ranking-affiliation">' + escapeHtml(user.affiliation) + '</div>' : '') +
           (districtLabel ? '<div class="ranking-district">' + districtLabel + '</div>' : '') +
         '</div>' +
         '<div class="ranking-score-col">' +

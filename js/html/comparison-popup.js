@@ -12,8 +12,8 @@ var _HTML_COMPARISON_POPUP = '' +
       '<div class="comparison-user-bar" id="comparison-user-bar"></div>' +
       '<div id="comparison-map" class="comparison-map"></div>' +
       '<div class="comparison-legend">' +
-        '<span class="legend-item"><span class="legend-dot" style="background:#34C759"></span>경로</span>' +
-        '<span class="legend-item"><span class="legend-dot legend-dot-area" style="background:rgba(52,199,89,0.35)"></span>활동 지역</span>' +
+        '<span class="legend-item"><span class="legend-dot" style="background:#00A94F"></span>경로</span>' +
+        '<span class="legend-item"><span class="legend-dot legend-dot-area" style="background:rgba(0,169,79,0.35)"></span>활동 지역</span>' +
       '</div>' +
       '<div id="comparison-stats" class="comparison-stats"></div>' +
     '</div>' +

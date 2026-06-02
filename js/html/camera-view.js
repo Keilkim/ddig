@@ -23,7 +23,7 @@ var _HTML_CAMERA_VIEW = '' +
     '</div>' +
     '<div id="camera-placeholder" class="camera-placeholder">' +
       '<div class="camera-placeholder-content">' +
-        '<div class="camera-placeholder-icon">📷</div>' +
+        '<div class="camera-placeholder-icon">' + iconImg('camera', { cls: 'camera-placeholder-icon-img', fallback: '📷' }) + '</div>' +
         '<p class="camera-placeholder-text">카메라를 시작하려면<br>아래 버튼을 눌러주세요</p>' +
         '<button class="camera-placeholder-btn" onclick="startCameraManual()">카메라 시작</button>' +
       '</div>' +

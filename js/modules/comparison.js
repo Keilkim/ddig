@@ -5,7 +5,7 @@
    ════════════════════════════════════════ */
 
 var _comparisonMap = null;
-var _DARK_TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+var _LIGHT_TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 
 /* ─── 상대방 경로 맵 열기 ─── */
 async function openComparisonMap(targetUserId, targetDisplayName) {
@@ -19,13 +19,14 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
   var userBar = document.getElementById('comparison-user-bar');
   if (userBar) {
     userBar.innerHTML =
-      '<div class="comparison-user"><span class="comparison-user-dot" style="background:#34C759"></span>' + targetDisplayName + '의 전체 경로</div>';
+      '<div class="comparison-user"><span class="comparison-user-dot" style="background:#00A94F"></span>' + escapeHtml(targetDisplayName) + '의 전체 경로</div>';
   }
 
   var mapEl = document.getElementById('comparison-map');
   if (!mapEl) return;
   mapEl.innerHTML = '<div class="ranking-empty"><div class="ranking-spinner"></div><div style="margin-top:12px;font-size:12px;color:var(--color-tertiary)">경로 불러오는 중...</div></div>';
 
+ try {
   // 데이터 로드
   var results = await Promise.all([
     loadUserRoutes(targetUserId),
@@ -35,7 +36,7 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
   var targetRoutes = results[0];
   var targetDistrictStats = results[1];
 
-  // 날짜별 그룹핑 (captured_at 기준)
+  // 날짜별 그룹핑 (captured_at 로컬 날짜 기준)
   var dayGroups = {};  // { 'YYYY-MM-DD': [[lat,lng], ...] }
   var allPoints = [];
   for (var i = 0; i < targetRoutes.length; i++) {
@@ -43,7 +44,7 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
     var lat = Number(r.latitude);
     var lng = Number(r.longitude);
     if (isFinite(lat) && isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-      var dayKey = r.captured_at ? r.captured_at.substring(0, 10) : 'unknown';
+      var dayKey = localDayKey(r.captured_at);
       if (!dayGroups[dayKey]) dayGroups[dayKey] = [];
       dayGroups[dayKey].push([lat, lng]);
       allPoints.push([lat, lng]);
@@ -55,8 +56,8 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
   if (allPoints.length === 0) {
     mapEl.innerHTML =
       '<div class="ranking-empty">' +
-        '<div style="font-size:40px;margin-bottom:12px">📍</div>' +
-        '<div>' + targetDisplayName + '님의 경로 데이터가 없습니다</div>' +
+        '<div class="ranking-empty-icon">' + iconImg('pin', { cls: 'ranking-empty-icon-img', fallback: '📍' }) + '</div>' +
+        '<div>' + escapeHtml(targetDisplayName) + '님의 경로 데이터가 없습니다</div>' +
         '<div style="margin-top:8px;font-size:12px;color:var(--color-tertiary)">GPS 정보가 있는 플로깅 기록이 필요합니다</div>' +
       '</div>';
     renderComparisonStats(0, 0);
@@ -65,8 +66,8 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
 
   // 날짜별 색상 팔레트
   var _dayColors = [
-    '#34C759','#FF9F0A','#0A84FF','#FF375F','#BF5AF2',
-    '#FFD60A','#64D2FF','#FF6482','#30D158','#AC8E68'
+    '#00A94F','#FF9F0A','#0A84FF','#FF375F','#BF5AF2',
+    '#FFB800','#00B8D9','#FF6482','#30D158','#AC8E68'
   ];
 
   // 맵 렌더링 — 컨테이너 크기 보장
@@ -90,7 +91,7 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
     scrollWheelZoom: true,
     doubleClickZoom: true
   });
-  L.tileLayer(_DARK_TILE_URL, { maxZoom: 19 }).addTo(_comparisonMap);
+  L.tileLayer(_LIGHT_TILE_URL, { maxZoom: 19 }).addTo(_comparisonMap);
   _comparisonMap.invalidateSize();
 
   // 시군구 바운더리
@@ -113,9 +114,9 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
         var visits = districtVisits[code] || 0;
         if (visits > 0) {
           var opacity = 0.15 + (visits / maxVisits) * 0.4;
-          return { color: '#34C759', weight: 2, fillColor: '#34C759', fillOpacity: opacity };
+          return { color: '#00A94F', weight: 2, fillColor: '#00A94F', fillOpacity: opacity };
         }
-        return { color: 'rgba(255,255,255,0.08)', weight: 0.5, fillColor: 'transparent', fillOpacity: 0 };
+        return { color: 'rgba(0,0,0,0.08)', weight: 0.5, fillColor: 'transparent', fillOpacity: 0 };
       },
       onEachFeature: function(feature, layer) {
         var code = feature.properties.SIG_CD;
@@ -192,6 +193,18 @@ async function openComparisonMap(targetUserId, targetDisplayName) {
   }
 
   renderComparisonStats(targetRoutes.length, totalDist);
+ } catch (err) {
+  console.error('상대방 경로 로드 실패:', err);
+  if (mapEl) {
+    mapEl.innerHTML =
+      '<div class="ranking-empty">' +
+        '<div class="ranking-empty-icon">' + iconImg('warning', { cls: 'ranking-empty-icon-img', fallback: '⚠️' }) + '</div>' +
+        '<div>경로를 불러오지 못했습니다</div>' +
+        '<div style="margin-top:8px;font-size:12px;color:var(--color-tertiary)">잠시 후 다시 시도해주세요</div>' +
+      '</div>';
+  }
+  renderComparisonStats(0, 0);
+ }
 }
 
 /* ─── 통계 렌더링 ─── */

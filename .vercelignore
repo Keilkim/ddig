@@ -1,0 +1,6 @@
+# 아이콘/픽토그램 생성 도구 — 배포 대상 아님 (로컬 전용)
+icon-gen/
+
+# 개발용 문서/스키마
+request.md
+supabase-schema.sql
