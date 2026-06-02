@@ -146,9 +146,9 @@ button:active, .btn:active {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ========================================
-   손그림 아이콘 (assets/icons/*.png)
+   손그림 아이콘 (assets/icons/*.webp)
    검은 잉크 → 밝은 타일 위에 표시. 에셋이 없으면 이모지로 폴백.
-   생성: icon-gen (node icon-gen/generate.mjs) · 헬퍼: js/html/icons.js
+   생성: icon-gen (generate.mjs → optimize.mjs, WebP) · 헬퍼: js/html/icons.js
    ======================================== */
 .app-icon {
   display: inline-block;

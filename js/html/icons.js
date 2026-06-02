@@ -1,12 +1,12 @@
 'use strict';
 
 /* ════════════════════════════════════════
-   아이콘 헬퍼 — 손그림 PNG 아이콘(assets/icons/*.png)을
+   아이콘 헬퍼 — 손그림 아이콘(assets/icons/*.webp)을
    <img> 로 렌더링하고, 에셋이 없으면 이모지/텍스트로 폴백.
 
    ⚠️ 이 파일은 다른 html 템플릿(camera-view.js 등)보다 먼저
        로드돼야 한다 (app.html 최상단).
-   생성: icon-gen (node icon-gen/generate.mjs) → assets/icons/<name>.png
+   생성: icon-gen — generate.mjs(PNG 마스터) → optimize.mjs(무손실 WebP) → assets/icons/<name>.webp
    ════════════════════════════════════════ */
 
 var ICON_BASE = 'assets/icons/';
@@ -52,7 +52,7 @@ function iconImg(name, opts) {
   var cls = 'app-icon' + (opts.cls ? ' ' + opts.cls : '');
   var alt = opts.alt || '';
   var fb = opts.fallback || '';
-  return '<img class="' + cls + '" src="' + ICON_BASE + name + '.png"' +
+  return '<img class="' + cls + '" src="' + ICON_BASE + name + '.webp"' +
          ' alt="' + alt + '" onerror="__iconFallback(this,\'' + fb + '\')">';
 }
 

@@ -8,7 +8,9 @@
     "gen": "node generate.mjs",
     "gen:force": "node generate.mjs --force",
     "list": "node generate.mjs --list",
-    "dry": "node generate.mjs --dry"
+    "dry": "node generate.mjs --dry",
+    "opt": "node optimize.mjs",
+    "build": "node generate.mjs && node optimize.mjs"
   },
   "engines": {
     "node": ">=18"
