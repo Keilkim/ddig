@@ -17,8 +17,15 @@
   <script src="supabase-config.js"></script>
 </head>
 <body class="safe-area-top safe-area-bottom">
+  <!-- 블러 처리된 배경 영상 (로딩 전/실패 시 images/login-bg.png 폴백) -->
+  <video class="login-bg-video" autoplay muted loop playsinline
+         preload="auto" poster="images/login-bg.png">
+    <source src="video/login-bg.mp4" type="video/mp4">
+  </video>
+  <div class="login-bg-overlay"></div>
+
   <div id="login-view" class="login-view">
-    <!-- 브랜딩은 배경 이미지(images/login-bg.png)가 담당 -->
+    <!-- 브랜딩은 배경 영상/이미지(images/login-bg.png)가 담당 -->
 
     <!-- 구글 로그인 영역 — 행사 중 임시 숨김. 복구하려면 아래 div의 hidden 속성만 제거 -->
     <div id="oauth-area" hidden>
