@@ -2,25 +2,22 @@
    로그인 — Green Governance 배경
    ======================================== */
 
-/* 배경 이미지 풀블리드 (login.html 전용 — login.css는 여기서만 로드됨).
-   base.css 의 body{background:#000} 보다 나중에 로드되어 우선 적용.
-   영상이 로드되기 전/실패 시 이 이미지가 그대로 폴백으로 보임. */
+/* 폴백 배경색 — 영상/이미지 로드 전·실패 시 (브랜딩 표시는 .login-bg-art가 담당).
+   base.css 의 body{background:#000} 보다 나중에 로드되어 우선 적용. */
 body {
-  background-image: url('../images/login-bg.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: #6BCB8B; /* 이미지 로드 전/누락 시 폴백 — 이미지 4 초록 근사값 */
+  background-color: #6BCB8B; /* 이미지 4 초록 근사값 */
 }
 
-/* ─── 블러 배경 영상 ─── */
+/* 레이어 순서(뒤→앞): 영상(-3) → 어둡게 오버레이(-2) → 브랜딩 이미지(-1) → 로그인 폼 */
+
+/* ─── 블러 배경 영상 (가장 뒤) ─── */
 .login-bg-video {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: -2;                       /* 로그인 UI 뒤 */
+  z-index: -3;
   filter: blur(14px) brightness(0.95) saturate(1.05); /* 뿌옇게 */
   transform: scale(1.12);            /* 블러 가장자리 비침 방지용 확대 */
   pointer-events: none;
@@ -30,13 +27,26 @@ body {
 .login-bg-overlay {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   pointer-events: none;
   background: linear-gradient(
     180deg,
     rgba(18, 38, 28, 0.20) 0%,
     rgba(18, 38, 28, 0.42) 100%
   );
+}
+
+/* 브랜딩 이미지(login-bg.png) — 영상 앞에 올림.
+   투명 영역으로는 블러 영상이 비치고, 텍스트·캐릭터만 또렷이 보임. */
+.login-bg-art {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url('../images/login-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
 }
 
 .login-view {

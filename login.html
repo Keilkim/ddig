@@ -17,12 +17,14 @@
   <script src="supabase-config.js"></script>
 </head>
 <body class="safe-area-top safe-area-bottom">
-  <!-- 블러 처리된 배경 영상 (로딩 전/실패 시 images/login-bg.png 폴백) -->
-  <video class="login-bg-video" autoplay muted loop playsinline
-         preload="auto" poster="images/login-bg.png">
+  <!-- 레이어 순서(뒤→앞): 블러 영상 → 어둡게 오버레이 → 브랜딩(login-bg.png) → 로그인 폼 -->
+  <!-- 블러 처리된 배경 영상 (가장 뒤) -->
+  <video class="login-bg-video" autoplay muted loop playsinline preload="auto">
     <source src="video/login-bg.mp4" type="video/mp4">
   </video>
   <div class="login-bg-overlay"></div>
+  <!-- 브랜딩 이미지 — 영상 앞에 올림 (투명 영역으로 영상이 비침). 영상 실패 시 폴백도 겸함 -->
+  <div class="login-bg-art" aria-hidden="true"></div>
 
   <div id="login-view" class="login-view">
     <!-- 브랜딩은 배경 영상/이미지(images/login-bg.png)가 담당 -->
