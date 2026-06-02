@@ -208,7 +208,14 @@ async function analyzePhoto(base64Image) {
     '- Styrofoam = "styrofoam" (NOT plastic)\n' +
     '- Metal can = "can"\n' +
     '- Milk/juice carton = "paperpack"\n' +
-    '- DO NOT use "other" unless truly unclassifiable\n\n' +
+    '- Use "other" only for real trash that fits no category above\n\n' +
+    'WHEN THERE IS NO TRASH (very important):\n' +
+    '- If the photo shows a person, a selfie, a face, hands, an animal, scenery,\n' +
+    '  the sky, furniture, food being eaten, or has NO discarded litter,\n' +
+    '  you MUST return is_trash:false.\n' +
+    '- Set is_trash:true ONLY when you can clearly see actual discarded trash/litter.\n' +
+    '- Do NOT invent or guess trash that is not visible. Returning is_trash:false is\n' +
+    '  the correct, expected answer for any photo without real litter.\n\n' +
     'BOUNDING BOX: [y_min, x_min, y_max, x_max], values 0-1000\n\n' +
     'Respond ONLY with JSON:\n' +
     '{"is_trash":true,"trash_category":"plastic",' +
@@ -284,10 +291,25 @@ async function analyzePhoto(base64Image) {
       }
     }
     var category = correctCategory(parsed);
-    var finalCategory = parsed.is_trash === false ? 'none' : category;
+
+    // ── 오탐 방지: 모델이 명시적으로 true를 줄 때만 쓰레기로 인정(fail-safe) ──
+    var isTrash = parsed.is_trash === true;
+
+    // ── 신뢰도 게이트: 쓰레기라면 충분히 확신하는 물체가 하나는 있어야 함 ──
+    // 물체가 전혀 없거나(헛감지) 최고 신뢰도가 임계값 미만이면 오탐으로 보고 기각.
+    var CONFIDENCE_THRESHOLD = 0.5;
+    var maxConf = 0;
+    for (var c = 0; c < objects.length; c++) {
+      if (objects[c].confidence > maxConf) maxConf = objects[c].confidence;
+    }
+    if (isTrash && (objects.length === 0 || maxConf < CONFIDENCE_THRESHOLD)) {
+      isTrash = false;
+    }
+
+    var finalCategory = isTrash ? category : 'none';
 
     return {
-      is_trash: parsed.is_trash !== false,
+      is_trash: isTrash,
       trash_category: finalCategory,
       pollution_impact: computePollutionImpact(finalCategory),
       description: parsed.description || '',
