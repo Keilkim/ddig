@@ -60,6 +60,16 @@
       <input id="simple-name" class="simple-input" type="text" placeholder="이름" autocomplete="off" maxlength="20">
       <input id="simple-affiliation" class="simple-input" type="text" placeholder="소속 (팀 / 단체)" autocomplete="off" maxlength="30">
       <input id="simple-phone4" class="simple-input" type="text" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="핸드폰 번호 뒤 4자리">
+
+      <!-- 자동 로그인 (기본 ON) — 실수로 닫아도 다시 열면 바로 입장 -->
+      <div class="auto-login-area simple-auto-login-area">
+        <label class="auto-login-toggle">
+          <input type="checkbox" id="simple-auto-login" onchange="toggleAutoLogin(this.checked)" checked>
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="auto-login-label">자동 로그인</span>
+      </div>
+
       <button type="submit" class="btn-simple">간편 시작하기</button>
     </form>
   </div>
@@ -71,8 +81,13 @@
   <!-- 페이지 초기화: 자동 로그인 체크박스 복원 + 자동 로그인 시도 -->
   <script>
     (function() {
-      var chk = document.getElementById('chk-auto-login');
-      if (chk) chk.checked = localStorage.getItem('digg_auto_login') === 'true';
+      // 자동 로그인 체크 상태 복원 — 최초 방문(저장값 없음)이면 기본 ON
+      var saved = localStorage.getItem('digg_auto_login');
+      var autoOn = (saved === null) ? true : (saved === 'true');
+      var sChk = document.getElementById('simple-auto-login');
+      if (sChk) sChk.checked = autoOn;
+      var gChk = document.getElementById('chk-auto-login');
+      if (gChk) gChk.checked = autoOn;
       if (typeof checkAutoLogin === 'function') checkAutoLogin();
     })();
 
@@ -81,7 +96,9 @@
       var name = document.getElementById('simple-name').value;
       var affiliation = document.getElementById('simple-affiliation').value;
       var phone4 = document.getElementById('simple-phone4').value;
-      signUpOrLoginSimple(name, affiliation, phone4);
+      var autoEl = document.getElementById('simple-auto-login');
+      var autoLogin = autoEl ? autoEl.checked : true;
+      signUpOrLoginSimple(name, affiliation, phone4, autoLogin);
     }
   </script>
 </body>

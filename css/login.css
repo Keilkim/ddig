@@ -176,6 +176,16 @@ body {
   max-width: 280px;
 }
 
+/* 간편 폼의 자동 로그인 — 어두운 영상 배경에서 잘 보이게 */
+.simple-auto-login-area {
+  justify-content: flex-start;
+  padding: 2px 2px;
+}
+.simple-auto-login-area .auto-login-label {
+  color: var(--color-white);
+  font-weight: 600;
+}
+
 .simple-input {
   width: 100%;
   padding: 12px var(--space-md);

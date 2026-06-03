@@ -70,7 +70,7 @@ function buildGuestCredentials(name, affiliation, phone4) {
   };
 }
 
-async function signUpOrLoginSimple(name, affiliation, phone4) {
+async function signUpOrLoginSimple(name, affiliation, phone4, autoLogin) {
   if (!supabaseClient) {
     if (!initSupabase()) { alert('Supabase 설정을 확인해주세요.'); return; }
   }
@@ -132,8 +132,8 @@ async function signUpOrLoginSimple(name, affiliation, phone4) {
       .eq('id', session.user.id);
   } catch (e) { /* 프로필 보강 실패는 치명적이지 않음 */ }
 
-  // 행사 중 재진입 편의를 위해 자동 로그인 ON
-  localStorage.setItem('digg_auto_login', 'true');
+  // 자동 로그인 설정 — 체크박스 값(기본 ON). ON이면 닫았다 켜도 세션 유지 시 바로 입장.
+  localStorage.setItem('digg_auto_login', (autoLogin === false) ? 'false' : 'true');
 
   window.location.replace('app.html');
 }
