@@ -281,6 +281,14 @@ function renderRouteMap(photos) {
   } else {
     _routeMap.fitBounds(points, { padding: [20, 20] });
   }
+
+  // 현재 위치(파란 점)도 함께 표시 — 뷰는 쓰레기 경로 기준 유지
+  // (위치가 화면 밖이면 우측 상단 "내 위치로" 버튼으로 이동)
+  getCurrentLocation().then(function(loc) {
+    if (token !== _routeMapToken || !_routeMap) return;  // 렌더 경쟁/맵 폐기 가드
+    if (!loc.latitude || !loc.longitude) return;
+    setMyLocationMarker(_routeMap, loc);
+  });
 }
 
 /* ─── 현재 위치 마커 (있으면 이동, 없으면 생성) ─── */
