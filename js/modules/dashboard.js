@@ -6,6 +6,7 @@
 
 var _chartTrashType = null;
 var _routeMap = null;
+var _myLocMarker = null;  // 현재 위치 마커 (맵 재생성 시 null로 리셋)
 var _routeMapToken = 0;  // 비동기 위치 조회 경쟁 방지용 토큰
 var _LIGHT_TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 
@@ -181,6 +182,7 @@ function renderRouteMap(photos) {
   if (_routeMap) {
     _routeMap.remove();
     _routeMap = null;
+    _myLocMarker = null;  // 마커는 이전 맵에 종속 — 함께 폐기
   }
   // Leaflet 내부 참조 제거 — 컨테이너 재사용 시 "already initialized" 방지
   delete mapEl._leaflet_id;
@@ -197,6 +199,7 @@ function renderRouteMap(photos) {
       if (_routeMap) { _routeMap.remove(); _routeMap = null; }
       delete mapEl._leaflet_id;
       mapEl.innerHTML = '';
+      _myLocMarker = null;
       _routeMap = L.map(mapEl, {
         zoomControl: false,
         attributionControl: false,
@@ -207,13 +210,8 @@ function renderRouteMap(photos) {
       });
       L.tileLayer(_LIGHT_TILE_URL, { maxZoom: 19 }).addTo(_routeMap);
       _routeMap.setView([loc.latitude, loc.longitude], 15);
-      var icon = L.divIcon({
-        html: '<span style="display:block;width:14px;height:14px;background:#3182F6;border-radius:50%;border:3px solid #fff;box-shadow:0 0 8px rgba(49,130,246,0.45)"></span>',
-        className: 'current-loc-marker',
-        iconSize: [14, 14],
-        iconAnchor: [7, 7]
-      });
-      L.marker([loc.latitude, loc.longitude], { icon: icon }).addTo(_routeMap);
+      setMyLocationMarker(_routeMap, loc);
+      addRecenterControl(_routeMap, mapEl);
     });
     return;
   }
@@ -256,6 +254,9 @@ function renderRouteMap(photos) {
     lvl.textContent = _routeMap.getZoom();
   });
 
+  // 내 위치로 버튼 (우측 상단)
+  addRecenterControl(_routeMap, mapEl);
+
   // 경로 선
   if (points.length > 1) {
     L.polyline(points, { color: '#00A94F', weight: 3, opacity: 0.85 }).addTo(_routeMap);
@@ -280,6 +281,59 @@ function renderRouteMap(photos) {
   } else {
     _routeMap.fitBounds(points, { padding: [20, 20] });
   }
+}
+
+/* ─── 현재 위치 마커 (있으면 이동, 없으면 생성) ─── */
+function setMyLocationMarker(map, loc) {
+  var ll = [loc.latitude, loc.longitude];
+  if (_myLocMarker) {
+    _myLocMarker.setLatLng(ll);
+    return;
+  }
+  var icon = L.divIcon({
+    html: '<span style="display:block;width:14px;height:14px;background:#3182F6;border-radius:50%;border:3px solid #fff;box-shadow:0 0 8px rgba(49,130,246,0.45)"></span>',
+    className: 'current-loc-marker',
+    iconSize: [14, 14],
+    iconAnchor: [7, 7]
+  });
+  _myLocMarker = L.marker(ll, { icon: icon, zIndexOffset: 1000 }).addTo(map);
+}
+
+/* ─── "내 위치로" 버튼 (우측 상단) ─── */
+// 클릭 시 현재 위치를 다시 조회해 지도를 그 지점으로 이동/확대하고 내 위치 마커를 갱신
+function addRecenterControl(map, mapEl) {
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'recenter-btn';
+  btn.setAttribute('aria-label', '내 위치로');
+  btn.title = '내 위치로';
+  btn.innerHTML =
+    '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" ' +
+    'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+      '<circle cx="12" cy="12" r="3.2"></circle>' +
+      '<line x1="12" y1="2" x2="12" y2="5"></line>' +
+      '<line x1="12" y1="19" x2="12" y2="22"></line>' +
+      '<line x1="2" y1="12" x2="5" y2="12"></line>' +
+      '<line x1="19" y1="12" x2="22" y2="12"></line>' +
+    '</svg>';
+
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (btn.classList.contains('loading')) return;  // 중복 클릭 방지
+    btn.classList.add('loading');
+    getCurrentLocation().then(function(loc) {
+      btn.classList.remove('loading');
+      if (!loc.latitude || !loc.longitude) {
+        alert('현재 위치를 가져올 수 없습니다. 위치 권한을 확인해주세요.');
+        return;
+      }
+      setMyLocationMarker(map, loc);
+      var zoom = Math.max(map.getZoom(), 16);
+      map.setView([loc.latitude, loc.longitude], zoom, { animate: true });
+    });
+  });
+
+  mapEl.appendChild(btn);
 }
 
 /* ─── GPS 포인트 간 거리 계산 (km) ─── */
