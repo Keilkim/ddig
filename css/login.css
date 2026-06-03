@@ -13,13 +13,15 @@ body {
 /* ─── 블러 배경 영상 (가장 뒤) ─── */
 .login-bg-video {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: 100vh;                     /* 폴백 */
+  height: 100lvh;                    /* iOS 동적 툴바와 무관하게 항상 화면 전체를 덮어 상·하단 빈틈 제거 */
+  object-fit: cover;                 /* 비율 유지 + 빈틈 없이 채움(넘치는 부분만 크롭) */
   z-index: -3;
-  filter: blur(5px) brightness(0.97) saturate(1.05); /* 살짝만 뿌옇게 */
-  transform: scale(1.06);            /* 블러 가장자리 비침 방지용 확대 */
+  filter: blur(3px) brightness(0.97) saturate(1.05); /* 아주 살짝만 뿌옇게 */
+  transform: scale(1.04);            /* 블러 가장자리 비침 방지용 확대 */
   pointer-events: none;
 }
 
