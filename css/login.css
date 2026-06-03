@@ -12,16 +12,20 @@ body {
 
 /* ─── 블러 배경 영상 (가장 뒤) ─── */
 .login-bg-video {
+  /* 비율 유지하며 화면을 빈틈없이 덮는 고전 기법:
+     영상을 화면 이상 크기로(min-width/height) 잡고 중앙 정렬 → 넘치는 부분만 크롭.
+     뷰포트 단위(vh/lvh) 계산에 의존하지 않아 모바일 툴바와 무관하게 상·하단 빈틈이 없음. */
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;                     /* 폴백 */
-  height: 100lvh;                    /* iOS 동적 툴바와 무관하게 항상 화면 전체를 덮어 상·하단 빈틈 제거 */
-  object-fit: cover;                 /* 비율 유지 + 빈틈 없이 채움(넘치는 부분만 크롭) */
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100vh;                 /* 폴백 */
+  min-height: 100lvh;                /* 큰 뷰포트 기준 — 항상 화면 이상 */
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%) scale(1.06); /* 중앙 정렬 + 가장자리 여유 */
   z-index: -3;
   filter: blur(3px) brightness(0.97) saturate(1.05); /* 아주 살짝만 뿌옇게 */
-  transform: scale(1.04);            /* 블러 가장자리 비침 방지용 확대 */
   pointer-events: none;
 }
 
