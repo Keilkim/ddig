@@ -302,6 +302,11 @@ async function analyzePhoto(base64Image) {
     }
     var category = correctCategory(parsed);
 
+    // 객체별 카테고리 — 라벨 키워드로 개별 추정, 실패 시 사진 대표 카테고리
+    for (var oi = 0; oi < objects.length; oi++) {
+      objects[oi].category = classifyByKeywords(objects[oi].label) || category;
+    }
+
     // ── 오탐 방지: 모델이 명시적으로 true를 줄 때만 쓰레기로 인정(fail-safe) ──
     var isTrash = parsed.is_trash === true;
 

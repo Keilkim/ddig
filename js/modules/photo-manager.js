@@ -158,8 +158,9 @@ function showConfirmModal(blob, analysis) {
   modal.className = 'detection-modal';
 
   var imgUrl = URL.createObjectURL(blob);
-  var categoryKey = analysis ? (analysis.trash_category || 'other') : 'other';
-  var categoryLabel = getCategoryLabel(categoryKey);
+
+  // 객체별 카테고리 기준으로 사진 대표 카테고리/오염도 먼저 정리
+  recomputePhotoCategory();
 
   modal.innerHTML =
     '<div class="detection-modal-card trash-card">' +
@@ -169,10 +170,8 @@ function showConfirmModal(blob, analysis) {
       '<div class="detection-modal-img-wrap" id="detection-img-wrap">' +
         '<img src="' + imgUrl + '" class="detection-modal-img" id="detection-img" />' +
         '<div class="detection-bbox-container" id="detection-bbox-container"></div>' +
-        '<div class="detection-badge trash-badge">' + categoryIconImg(categoryKey, { cls: 'category-icon', fallback: '' }) + categoryLabel + '</div>' +
       '</div>' +
       (analysis ? '<p class="detection-modal-desc">' + (analysis.description || '') + '</p>' : '') +
-      (analysis ? buildCategorySelect(analysis.trash_category) : '') +
       buildObjectsList(analysis ? analysis.objects : []) +
       '<div class="detection-modal-actions">' +
         '<button class="detection-btn detection-btn-cancel" onclick="cancelCapture()">취소</button>' +
@@ -297,13 +296,13 @@ function objectsListItemsHTML(objects) {
   for (var i = 0; i < objects.length; i++) {
     var obj = objects[i];
     var conf = Math.round((obj.confidence || 0) * 100);
-    var confClass = conf >= 80 ? 'conf-high' : conf >= 50 ? 'conf-mid' : 'conf-low';
+    // 카테고리 보정: 없으면 라벨 키워드로 추정 → 'other'. 재렌더/저장 일관성 위해 되써넣음.
+    var cat = obj.category || classifyByKeywords(obj.label) || 'other';
+    obj.category = cat;
     html +=
       '<div class="detection-object-item">' +
         '<span class="detection-object-name">' + (obj.label || '알 수 없음') + '</span>' +
-        '<div class="detection-conf-bar">' +
-          '<div class="detection-conf-fill ' + confClass + '" style="width:' + conf + '%"></div>' +
-        '</div>' +
+        objectCategorySelectHTML(i, cat) +
         '<span class="detection-conf-num">' + conf + '%</span>' +
         '<button type="button" class="detection-object-remove" ' +
           'onclick="removeDetection(' + i + ')" ' +
@@ -311,6 +310,56 @@ function objectsListItemsHTML(objects) {
       '</div>';
   }
   return html;
+}
+
+/* ─── 객체별 카테고리 콤보박스 ─── */
+function objectCategorySelectHTML(index, selectedCategory) {
+  var html = '<select class="detection-object-category" ' +
+    'onchange="onObjectCategoryChange(' + index + ', this.value)">';
+  for (var i = 0; i < _CATEGORY_OPTIONS.length; i++) {
+    var opt = _CATEGORY_OPTIONS[i];
+    var sel = (opt.value === selectedCategory) ? ' selected' : '';
+    html += '<option value="' + opt.value + '"' + sel + '>' + opt.label + '</option>';
+  }
+  html += '</select>';
+  return html;
+}
+
+/* ─── 객체 카테고리 변경 — 사람이 직접 확정 → 신뢰도 100% 강제 ─── */
+function onObjectCategoryChange(index, newCategory) {
+  if (!_pendingCapture || !_pendingCapture.analysis) return;
+  var objects = _pendingCapture.analysis.objects;
+  if (!Array.isArray(objects) || index < 0 || index >= objects.length) return;
+
+  objects[index].category = newCategory;
+  objects[index].confidence = 1.0;       // 사람이 직접 인식 → 100% 강제
+  objects[index].userVerified = true;
+
+  // 셀렉트 깜빡임 방지: 전체 재렌더 대신 해당 행 % 표시만 100%로 갱신
+  var items = document.querySelectorAll('#detection-objects-list .detection-object-item');
+  if (items[index]) {
+    var numEl = items[index].querySelector('.detection-conf-num');
+    if (numEl) numEl.textContent = '100%';
+  }
+
+  recomputePhotoCategory();
+  renderBoundingBoxes(objects);           // 이미지 위 박스 라벨 %도 100으로 갱신
+}
+
+/* ─── 객체들로부터 사진 대표 카테고리/오염도 재계산 ─── */
+// 대표 = 신뢰도 최고 객체(사용자가 고친 항목은 100%라 우선). 비어 있으면 기존 값 유지.
+function recomputePhotoCategory() {
+  if (!_pendingCapture || !_pendingCapture.analysis) return;
+  var objects = _pendingCapture.analysis.objects;
+  if (!Array.isArray(objects) || objects.length === 0) return;
+
+  var best = objects[0];
+  for (var i = 1; i < objects.length; i++) {
+    if ((objects[i].confidence || 0) > (best.confidence || 0)) best = objects[i];
+  }
+  var rep = best.category || 'other';
+  _pendingCapture.analysis.trash_category = rep;
+  _pendingCapture.analysis.pollution_impact = computePollutionImpact(rep);
 }
 
 /* ─── 인식 항목 삭제 (X 버튼) ─── */
@@ -321,6 +370,7 @@ function removeDetection(index) {
   if (!Array.isArray(objects) || index < 0 || index >= objects.length) return;
 
   objects.splice(index, 1);
+  recomputePhotoCategory();
 
   // 리스트 재렌더(인덱스 재계산) + 이미지 위 바운딩박스 다시 그리기
   var listEl = document.getElementById('detection-objects-list');
