@@ -284,10 +284,16 @@ function onCategoryChange(newCategory) {
 }
 
 /* ─── 오브젝트 리스트 ─── */
+// 컨테이너는 항상 렌더 → X 삭제 후 재렌더 대상(id) 확보. 비어 있으면 CSS(:empty)로 숨김.
 function buildObjectsList(objects) {
-  if (!objects || objects.length === 0) return '';
+  return '<div class="detection-objects-list" id="detection-objects-list">' +
+    objectsListItemsHTML(objects) +
+    '</div>';
+}
 
-  var html = '<div class="detection-objects-list">';
+function objectsListItemsHTML(objects) {
+  if (!objects || objects.length === 0) return '';
+  var html = '';
   for (var i = 0; i < objects.length; i++) {
     var obj = objects[i];
     var conf = Math.round((obj.confidence || 0) * 100);
@@ -299,10 +305,27 @@ function buildObjectsList(objects) {
           '<div class="detection-conf-fill ' + confClass + '" style="width:' + conf + '%"></div>' +
         '</div>' +
         '<span class="detection-conf-num">' + conf + '%</span>' +
+        '<button type="button" class="detection-object-remove" ' +
+          'onclick="removeDetection(' + i + ')" ' +
+          'aria-label="이 인식 삭제" title="이 인식 삭제">&times;</button>' +
       '</div>';
   }
-  html += '</div>';
   return html;
+}
+
+/* ─── 인식 항목 삭제 (X 버튼) ─── */
+// 저장 전 _pendingCapture.analysis.objects에서 제거 → gemini_raw.objects(DB)에도 안 쌓임.
+function removeDetection(index) {
+  if (!_pendingCapture || !_pendingCapture.analysis) return;
+  var objects = _pendingCapture.analysis.objects;
+  if (!Array.isArray(objects) || index < 0 || index >= objects.length) return;
+
+  objects.splice(index, 1);
+
+  // 리스트 재렌더(인덱스 재계산) + 이미지 위 바운딩박스 다시 그리기
+  var listEl = document.getElementById('detection-objects-list');
+  if (listEl) listEl.innerHTML = objectsListItemsHTML(objects);
+  renderBoundingBoxes(objects);
 }
 
 /* ─── 카테고리 라벨 (환경부 분류 기준) ─── */

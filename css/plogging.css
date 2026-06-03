@@ -631,6 +631,32 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* 인식 항목 삭제(X) 버튼 — 퍼센트 뒤 */
+.detection-object-remove {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin-left: 2px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-fill);
+  color: var(--color-secondary);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.detection-object-remove:hover { background: var(--color-red); color: #fff; }
+.detection-object-remove:active { transform: scale(0.88); }
+
+/* 모든 인식을 지우면 빈 컨테이너 숨김 */
+.detection-objects-list:empty { display: none; }
+
 /* 오염 영향도 — 숨김 */
 .detection-impact { display: none; }
 
