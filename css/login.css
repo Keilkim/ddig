@@ -43,9 +43,15 @@ body {
    투명 영역으로는 블러 영상이 비침. */
 .login-bg-art {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* 폼과 동일하게 '실제 보이는 영역' 기준 — 브라우저 바를 제외해 위아래 균형을 맞춤.
+     dvh/safe-area 값은 기기·브라우저별로 자동 적응(직접 기종 감지 불필요). */
+  height: 100vh;                     /* 폴백 */
+  height: 100dvh;                    /* 주소창/하단바 제외한 보이는 높이 */
   z-index: -1;
-  /* 상단은 상태바/노치 안전영역(최소 24px), 좌우/하단 24px 여백 */
+  /* 상·하단 OS 안전영역(노치/홈인디케이터) 반영, 최소 24px 좌우 여백 */
   padding: max(env(safe-area-inset-top), 24px) 24px max(env(safe-area-inset-bottom), 24px);
   background-image: url('../images/login-bg.png');
   background-size: contain;          /* 전체가 보이도록 — 잘림 없음 */
