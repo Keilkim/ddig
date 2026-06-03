@@ -210,13 +210,19 @@ async function analyzePhoto(base64Image) {
     '- Metal can = "can"\n' +
     '- Milk/juice carton = "paperpack"\n' +
     '- Use "other" only for real trash that fits no category above\n\n' +
-    'WHEN THERE IS NO TRASH (very important):\n' +
-    '- If the photo shows a person, a selfie, a face, hands, an animal, scenery,\n' +
-    '  the sky, furniture, food being eaten, or has NO discarded litter,\n' +
-    '  you MUST return is_trash:false.\n' +
-    '- Set is_trash:true ONLY when you can clearly see actual discarded trash/litter.\n' +
-    '- Do NOT invent or guess trash that is not visible. Returning is_trash:false is\n' +
-    '  the correct, expected answer for any photo without real litter.\n\n' +
+    'PLOGGING CONTEXT (very important):\n' +
+    '- This is a plogging app. Users PICK UP litter and usually HOLD it in their hand\n' +
+    '  while taking the photo. A held item is the NORMAL case, not an exception.\n' +
+    '- A bottle, can, cup, wrapper, bag, carton, etc. IS trash even when a person or\n' +
+    '  hand is holding it, and even if it still contains liquid, drink, or food residue.\n' +
+    '  Judge by the ITEM itself, classify the held item, and set is_trash:true.\n' +
+    '- The mere presence of a person, face, or hand does NOT mean "no trash".\n\n' +
+    'WHEN THERE IS NO TRASH:\n' +
+    '- Return is_trash:false ONLY if there is genuinely NO litter/recyclable item in\n' +
+    '  the frame: e.g. a plain selfie or face holding nothing, scenery, the sky, an\n' +
+    '  animal, furniture, or a plated meal with no packaging/container shown.\n' +
+    '- Do NOT invent trash that is not visible — but do NOT ignore real trash just\n' +
+    '  because someone is holding it. Missing held litter is a serious error here.\n\n' +
     'BOUNDING BOX: [y_min, x_min, y_max, x_max], values 0-1000\n\n' +
     'Respond ONLY with JSON:\n' +
     '{"is_trash":true,"trash_category":"plastic",' +
@@ -299,14 +305,16 @@ async function analyzePhoto(base64Image) {
     // ── 오탐 방지: 모델이 명시적으로 true를 줄 때만 쓰레기로 인정(fail-safe) ──
     var isTrash = parsed.is_trash === true;
 
-    // ── 신뢰도 게이트: 쓰레기라면 충분히 확신하는 물체가 하나는 있어야 함 ──
-    // 물체가 전혀 없거나(헛감지) 최고 신뢰도가 임계값 미만이면 오탐으로 보고 기각.
-    var CONFIDENCE_THRESHOLD = 0.5;
+    // ── 신뢰도 게이트(약하게) ──
+    // 플로깅에선 진짜 쓰레기를 놓치는 false negative가 더 치명적이다.
+    // 그래서 모델의 is_trash 판단을 최대한 신뢰하고, 물체가 있는데 그 확신이
+    // 거의 0에 가까운 명백한 노이즈일 때만 기각한다(물체 미검출은 기각하지 않음).
+    var CONFIDENCE_THRESHOLD = 0.35;
     var maxConf = 0;
     for (var c = 0; c < objects.length; c++) {
       if (objects[c].confidence > maxConf) maxConf = objects[c].confidence;
     }
-    if (isTrash && (objects.length === 0 || maxConf < CONFIDENCE_THRESHOLD)) {
+    if (isTrash && objects.length > 0 && maxConf < CONFIDENCE_THRESHOLD) {
       isTrash = false;
     }
 
