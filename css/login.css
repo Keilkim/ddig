@@ -18,8 +18,8 @@ body {
   height: 100%;
   object-fit: cover;
   z-index: -3;
-  filter: blur(14px) brightness(0.95) saturate(1.05); /* 뿌옇게 */
-  transform: scale(1.12);            /* 블러 가장자리 비침 방지용 확대 */
+  filter: blur(5px) brightness(0.97) saturate(1.05); /* 살짝만 뿌옇게 */
+  transform: scale(1.06);            /* 블러 가장자리 비침 방지용 확대 */
   pointer-events: none;
 }
 
